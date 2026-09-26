@@ -319,8 +319,10 @@
     position:fixed; top:0; left:0; z-index:9998;
     pointer-events:none;
     border-radius:50%;
-    transform:translate(-50%,-50%);
+    transform:translate3d(-100px,-100px,0) translate(-50%,-50%);
     mix-blend-mode:difference;
+    will-change:transform;
+    backface-visibility:hidden;
   }
   .cursor-dot{ width:6px; height:6px; background:#fff; }
   .cursor-ring{
@@ -341,11 +343,19 @@
     position:fixed; inset:0; z-index:9999;
     background:var(--paper);
     display:flex; align-items:center; justify-content:center;
-    transition:opacity .6s ease;
+    transition:opacity .7s ease, filter .7s ease;
+    will-change:opacity, filter;
   }
-  .intro-overlay img{ width:110px; height:auto; opacity:0; transform:scale(.92); transition:opacity .5s ease, transform .5s ease; }
-  .intro-overlay.show img{ opacity:1; transform:scale(1); }
-  .intro-overlay.hide{ opacity:0; pointer-events:none; }
+  .intro-letters{ display:flex; align-items:flex-end; gap:16px; }
+  .intro-letter{
+    height:60px; width:auto;
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .5s ease, transform .5s ease;
+    transition-delay:calc(var(--i,0) * 220ms);
+  }
+  .intro-overlay.show .intro-letter{ opacity:1; transform:none; }
+  .intro-overlay.hide{ opacity:0; filter:blur(20px); pointer-events:none; }
   @media (prefers-reduced-motion: reduce){ .intro-overlay{ display:none; } }
 
   /* ---------- hero split words ---------- */
@@ -381,7 +391,11 @@
 </head>
 <body>
 <div class="intro-overlay" id="introOverlay" aria-hidden="true">
-  <img src="assets/logo-mark-transparent.png" alt="">
+  <div class="intro-letters">
+    <img class="intro-letter" src="assets/letter-v.png" alt="" style="--i:0">
+    <img class="intro-letter" src="assets/letter-e.png" alt="" style="--i:1">
+    <img class="intro-letter" src="assets/letter-o.png" alt="" style="--i:2">
+  </div>
 </div>
 <noscript><style>.intro-overlay{display:none}</style></noscript>
 
@@ -616,9 +630,9 @@
     function finish(){
       el.classList.add('hide');
       document.documentElement.style.overflow = '';
-      setTimeout(function(){ if(el && el.parentNode) el.parentNode.removeChild(el); }, 650);
+      setTimeout(function(){ if(el && el.parentNode) el.parentNode.removeChild(el); }, 750);
     }
-    setTimeout(finish, 1100);
+    setTimeout(finish, 1500);
   }catch(e){
     var el2 = document.getElementById('introOverlay');
     if(el2 && el2.parentNode) el2.parentNode.removeChild(el2);
@@ -646,17 +660,24 @@
     if(!dot || !ring) return;
     document.body.classList.add('has-cursor');
     var mx = -100, my = -100, rx = -100, ry = -100;
+    var raf = null;
+    function setDot(x, y){ dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) translate(-50%,-50%)'; }
+    function setRing(x, y){ ring.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) translate(-50%,-50%)'; }
     window.addEventListener('mousemove', function(e){
       mx = e.clientX; my = e.clientY;
-      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+      setDot(mx, my);
+      if(raf === null) raf = requestAnimationFrame(loop);
     }, { passive:true });
     function loop(){
-      rx += (mx - rx) * 0.18;
-      ry += (my - ry) * 0.18;
-      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-      requestAnimationFrame(loop);
+      rx += (mx - rx) * 0.2;
+      ry += (my - ry) * 0.2;
+      setRing(rx, ry);
+      if(Math.abs(mx - rx) > 0.3 || Math.abs(my - ry) > 0.3){
+        raf = requestAnimationFrame(loop);
+      } else {
+        raf = null;
+      }
     }
-    requestAnimationFrame(loop);
     var hoverables = document.querySelectorAll('a, button, .feature, .journey-row');
     hoverables.forEach(function(el){
       el.addEventListener('mouseenter', function(){ ring.classList.add('hover'); });

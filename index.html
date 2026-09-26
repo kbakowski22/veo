@@ -313,28 +313,6 @@
     .final{ min-height:50vh; }
   }
 
-  /* ---------- custom cursor ---------- */
-  body.has-cursor, body.has-cursor a, body.has-cursor button{ cursor:none; }
-  .cursor-dot, .cursor-ring{
-    position:fixed; top:0; left:0; z-index:9998;
-    pointer-events:none;
-    border-radius:50%;
-    transform:translate3d(-100px,-100px,0) translate(-50%,-50%);
-    mix-blend-mode:difference;
-    will-change:transform;
-    backface-visibility:hidden;
-  }
-  .cursor-dot{ width:6px; height:6px; background:#fff; }
-  .cursor-ring{
-    width:34px; height:34px;
-    border:1px solid #fff;
-    transition:width .25s ease, height .25s ease;
-  }
-  .cursor-ring.hover{ width:64px; height:64px; }
-  @media (hover:none), (pointer:coarse), (prefers-reduced-motion: reduce){
-    .cursor-dot, .cursor-ring{ display:none; }
-  }
-
   /* ---------- grain ---------- */
   .grain{ position:fixed; inset:0; z-index:40; pointer-events:none; opacity:.045; mix-blend-mode:multiply; }
 
@@ -343,19 +321,20 @@
     position:fixed; inset:0; z-index:9999;
     background:var(--paper);
     display:flex; align-items:center; justify-content:center;
-    transition:opacity .7s ease, filter .7s ease;
-    will-change:opacity, filter;
+    transition:opacity .9s ease, transform .9s ease;
+    will-change:opacity, transform;
   }
   .intro-letters{ display:flex; align-items:flex-end; gap:16px; }
   .intro-letter{
     height:60px; width:auto;
     opacity:0;
     transform:translateY(14px);
-    transition:opacity .5s ease, transform .5s ease;
-    transition-delay:calc(var(--i,0) * 220ms);
+    transition:opacity .7s ease, transform .7s ease;
+    transition-delay:calc(var(--i,0) * 280ms);
+    will-change:opacity, transform;
   }
   .intro-overlay.show .intro-letter{ opacity:1; transform:none; }
-  .intro-overlay.hide{ opacity:0; filter:blur(20px); pointer-events:none; }
+  .intro-overlay.hide{ opacity:0; transform:scale(1.04); pointer-events:none; }
   @media (prefers-reduced-motion: reduce){ .intro-overlay{ display:none; } }
 
   /* ---------- hero split words ---------- */
@@ -405,9 +384,6 @@
     <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
   </svg>
 </div>
-
-<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
-<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 
 <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -630,9 +606,9 @@
     function finish(){
       el.classList.add('hide');
       document.documentElement.style.overflow = '';
-      setTimeout(function(){ if(el && el.parentNode) el.parentNode.removeChild(el); }, 750);
+      setTimeout(function(){ if(el && el.parentNode) el.parentNode.removeChild(el); }, 950);
     }
-    setTimeout(finish, 1500);
+    setTimeout(finish, 1750);
   }catch(e){
     var el2 = document.getElementById('introOverlay');
     if(el2 && el2.parentNode) el2.parentNode.removeChild(el2);
@@ -647,42 +623,6 @@
     var n = document.getElementById('grainNoise');
     if(!n) return;
     setInterval(function(){ n.setAttribute('seed', String(Math.floor(Math.random()*100))); }, 180);
-  }catch(e){}
-})();
-
-/* custom cursor: dot + lagging ring, grows over interactive elements */
-(function(){
-  try{
-    if(!window.matchMedia('(pointer: fine)').matches) return;
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var dot = document.getElementById('cursorDot');
-    var ring = document.getElementById('cursorRing');
-    if(!dot || !ring) return;
-    document.body.classList.add('has-cursor');
-    var mx = -100, my = -100, rx = -100, ry = -100;
-    var raf = null;
-    function setDot(x, y){ dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) translate(-50%,-50%)'; }
-    function setRing(x, y){ ring.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) translate(-50%,-50%)'; }
-    window.addEventListener('mousemove', function(e){
-      mx = e.clientX; my = e.clientY;
-      setDot(mx, my);
-      if(raf === null) raf = requestAnimationFrame(loop);
-    }, { passive:true });
-    function loop(){
-      rx += (mx - rx) * 0.2;
-      ry += (my - ry) * 0.2;
-      setRing(rx, ry);
-      if(Math.abs(mx - rx) > 0.3 || Math.abs(my - ry) > 0.3){
-        raf = requestAnimationFrame(loop);
-      } else {
-        raf = null;
-      }
-    }
-    var hoverables = document.querySelectorAll('a, button, .feature, .journey-row');
-    hoverables.forEach(function(el){
-      el.addEventListener('mouseenter', function(){ ring.classList.add('hover'); });
-      el.addEventListener('mouseleave', function(){ ring.classList.remove('hover'); });
-    });
   }catch(e){}
 })();
 

@@ -316,27 +316,6 @@
   /* ---------- grain ---------- */
   .grain{ position:fixed; inset:0; z-index:40; pointer-events:none; opacity:.045; mix-blend-mode:multiply; }
 
-  /* ---------- intro overlay ---------- */
-  .intro-overlay{
-    position:fixed; inset:0; z-index:9999;
-    background:var(--paper);
-    display:flex; align-items:center; justify-content:center;
-    transition:opacity .9s ease, transform .9s ease;
-    will-change:opacity, transform;
-  }
-  .intro-letters{ display:flex; align-items:flex-end; gap:16px; }
-  .intro-letter{
-    height:60px; width:auto;
-    opacity:0;
-    transform:translateY(14px);
-    transition:opacity .7s ease, transform .7s ease;
-    transition-delay:calc(var(--i,0) * 280ms);
-    will-change:opacity, transform;
-  }
-  .intro-overlay.show .intro-letter{ opacity:1; transform:none; }
-  .intro-overlay.hide{ opacity:0; transform:scale(1.04); pointer-events:none; }
-  @media (prefers-reduced-motion: reduce){ .intro-overlay{ display:none; } }
-
   /* ---------- hero split words ---------- */
   .hero h1 .word{ display:inline-block; }
   @media (prefers-reduced-motion: no-preference){
@@ -369,18 +348,9 @@
 
 </head>
 <body>
-<div class="intro-overlay" id="introOverlay" aria-hidden="true">
-  <div class="intro-letters">
-    <img class="intro-letter" src="assets/letter-v.png" alt="" style="--i:0">
-    <img class="intro-letter" src="assets/letter-e.png" alt="" style="--i:1">
-    <img class="intro-letter" src="assets/letter-o.png" alt="" style="--i:2">
-  </div>
-</div>
-<noscript><style>.intro-overlay{display:none}</style></noscript>
-
 <div class="grain" aria-hidden="true">
   <svg width="100%" height="100%">
-    <filter id="noiseFilter"><feTurbulence id="grainNoise" type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" seed="2"/></filter>
+    <filter id="noiseFilter"><feTurbulence id="grainNoise" type="fractalNoise" baseFrequency="0.85" numOctaves="1" stitchTiles="stitch" seed="2"/></filter>
     <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
   </svg>
 </div>
@@ -593,36 +563,13 @@
 </footer>
 
 <script>
-/* intro overlay: brief logo reveal, then fade out */
-(function(){
-  try{
-    var el = document.getElementById('introOverlay');
-    if(!el) return;
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ el.parentNode.removeChild(el); return; }
-    document.documentElement.style.overflow = 'hidden';
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){ el.classList.add('show'); });
-    });
-    function finish(){
-      el.classList.add('hide');
-      document.documentElement.style.overflow = '';
-      setTimeout(function(){ if(el && el.parentNode) el.parentNode.removeChild(el); }, 950);
-    }
-    setTimeout(finish, 1750);
-  }catch(e){
-    var el2 = document.getElementById('introOverlay');
-    if(el2 && el2.parentNode) el2.parentNode.removeChild(el2);
-    document.documentElement.style.overflow = '';
-  }
-})();
-
 /* living grain: subtle flicker */
 (function(){
   try{
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var n = document.getElementById('grainNoise');
     if(!n) return;
-    setInterval(function(){ n.setAttribute('seed', String(Math.floor(Math.random()*100))); }, 180);
+    setInterval(function(){ n.setAttribute('seed', String(Math.floor(Math.random()*100))); }, 600);
   }catch(e){}
 })();
 

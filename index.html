@@ -97,7 +97,7 @@
   @media (prefers-reduced-motion: reduce){ nav{ transition:none; } }
   .nav{ display:flex; justify-content:space-between; align-items:center; }
   .logo{ display:flex; align-items:center; gap:10px; }
-  .brand-logo{ display:block; width:104px; height:auto; max-height:30px; object-fit:contain; object-position:left center; }
+  .brand-logo{ display:block; width:130px; height:auto; max-height:38px; object-fit:contain; object-position:left center; }
   .navlinks{ display:flex; gap:30px; font-size:12px; text-transform:uppercase; letter-spacing:.12em; }
   .navlinks a{ opacity:.7; position:relative; padding-bottom:4px; transition:opacity .25s ease; }
   .navlinks a::after{ content:""; position:absolute; left:0; right:100%; bottom:0; height:1px; background:var(--ink); transition:right .3s ease; }
@@ -158,7 +158,7 @@
   .marquee-track{
     display:inline-flex;
     align-items:center;
-    animation:scrollLeft 36s linear infinite;
+    animation:scrollLeft 64s linear infinite;
     will-change:transform;
   }
   .marquee:hover .marquee-track{ animation-play-state:paused; }
@@ -325,7 +325,7 @@
 <nav id="siteNav">
   <div class="wrap nav">
     <a class="logo" href="#top">
-      <img class="brand-logo" src="assets/logo-mark-transparent.png" alt="Veo Development">
+      <img class="brand-logo" src="assets/logo-full-transparent.png" alt="Veo Development">
     </a>
     <div class="navlinks">
       <a class="section-link" href="#o-nas">O nas</a>
@@ -358,6 +358,12 @@
 
   <div class="marquee" aria-hidden="true">
     <div class="marquee-track">
+      <span>Veo Development</span><span class="dim">✦</span>
+      <span>Est. 2026</span><span class="dim">✦</span>
+      <span>Inni patrzą. My widzimy.</span><span class="dim">✦</span>
+      <span>Veo Development</span><span class="dim">✦</span>
+      <span>Est. 2026</span><span class="dim">✦</span>
+      <span>Inni patrzą. My widzimy.</span><span class="dim">✦</span>
       <span>Veo Development</span><span class="dim">✦</span>
       <span>Est. 2026</span><span class="dim">✦</span>
       <span>Inni patrzą. My widzimy.</span><span class="dim">✦</span>

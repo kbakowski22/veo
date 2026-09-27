@@ -383,6 +383,27 @@
   .reveal.visible .rule-draw{ transform:scaleX(1); }
   @media (prefers-reduced-motion: reduce){ .rule-draw{ transform:scaleX(1); transition:none; } }
 
+  /* ---------- V motif: watermark + drawn divider ---------- */
+  .has-vmark{ overflow:hidden; }
+  .has-vmark > .wrap, .has-vmark > .v-divider{ position:relative; z-index:1; }
+  .v-watermark{
+    position:absolute; z-index:0; right:-5%; bottom:-16%;
+    font-family:var(--serif); font-weight:400; font-style:normal;
+    line-height:.8; font-size:clamp(260px, 36vw, 600px);
+    color:rgba(0,0,0,.035); pointer-events:none; user-select:none;
+  }
+  .dark .v-watermark{ color:rgba(255,255,255,.035); }
+
+  .v-divider{ display:flex; justify-content:center; margin-bottom:36px; }
+  .v-divider path{
+    fill:none; stroke:var(--ink); stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:80; stroke-dashoffset:80;
+    transition:stroke-dashoffset 1.1s cubic-bezier(.16,.8,.24,1) .15s;
+  }
+  .v-divider.visible path{ stroke-dashoffset:0; }
+  .dark .v-divider path{ stroke:var(--paper); }
+  @media (prefers-reduced-motion: reduce){ .v-divider path{ transition:none; stroke-dashoffset:0; } }
+
   /* ---------- full-width statement break ---------- */
   .statement-break{ background:var(--stone); text-align:center; }
   .statement-break .rule-draw{ margin-inline:auto; }
@@ -526,7 +547,9 @@
     </div>
   </section>
 
-  <section class="section dark slant-l">
+  <section class="section dark slant-l has-vmark">
+    <div class="v-divider reveal" aria-hidden="true"><svg viewBox="0 0 60 30" width="60" height="30"><path d="M4,2 L30,26 L56,2"/></svg></div>
+    <span class="v-watermark" aria-hidden="true">V</span>
     <div class="wrap reveal">
       <div class="two-col">
         <div><div class="eyebrow">Nasz cel</div></div>
@@ -603,7 +626,7 @@
     </div>
   </section>
 
-  <section class="section final">
+  <section class="section final has-vmark">
     <svg class="final-deco" viewBox="0 0 220 220" aria-hidden="true">
       <g opacity="0.15" stroke="var(--ink)" stroke-width="1" fill="none">
         <line x1="0" y1="60" x2="0" y2="220"/>
@@ -611,6 +634,8 @@
         <circle cx="0" cy="60" r="3" fill="var(--ink)" stroke="none"/>
       </g>
     </svg>
+    <span class="v-watermark" aria-hidden="true">V</span>
+    <div class="v-divider reveal" aria-hidden="true"><svg viewBox="0 0 60 30" width="60" height="30"><path d="M4,2 L30,26 L56,2"/></svg></div>
     <div class="wrap reveal">
       <div class="eyebrow">Veo Development</div>
       <h2 class="serif" style="margin-top:24px">Wiosna<br><i>2027.</i></h2>

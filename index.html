@@ -72,8 +72,8 @@
     transition:opacity .25s ease;
   }
   .cta{ transition:opacity .25s ease, transform .2s ease; }
-  .cta::after{ content:'↗'; font-size:16px; transition:transform .3s ease; }
-  .cta:hover::after{ transform:translate(3px,-3px); }
+  .cta-arrow{ width:13px; height:13px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; transition:transform .3s ease; }
+  .cta:hover .cta-arrow{ transform:translate(3px,-3px); }
   .dark .cta, .contact .cta{ border-color:var(--paper); }
 
   /* ---------- scroll progress ---------- */
@@ -474,7 +474,7 @@
       <div class="hero-side">
         <p>Kameralne inwestycje, które projektujemy z myślą o ludziach, którzy w nich zamieszkają.</p>
         <div class="meta">
-          <a class="cta" href="#o-nas">Poznaj naszą misję</a>
+          <a class="cta" href="#o-nas">Poznaj naszą misję<svg class="cta-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4,12 L12,4 M6,4 H12 V10"/></svg></a>
           <span class="scroll">Scroll</span>
         </div>
       </div>
@@ -645,7 +645,7 @@
         <div class="unit"><span class="num" id="cd-secs">—</span><span class="label">Sek.</span></div>
       </div>
       <p class="final-note">Termin orientacyjny, liczony do 1 marca 2027 — zależny od zakończenia etapów gruntu, projektu i pozwoleń opisanych powyżej.</p>
-      <a class="cta" href="mailto:kontakt@veodevelopment.pl">Napisz do nas</a>
+      <a class="cta" href="mailto:kontakt@veodevelopment.pl">Napisz do nas<svg class="cta-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4,12 L12,4 M6,4 H12 V10"/></svg></a>
     </div>
   </section>
 
@@ -659,7 +659,7 @@
         </div>
         <div class="contact-actions">
           <a class="mail-link" href="mailto:kontakt@veodevelopment.pl">kontakt@veodevelopment.pl</a>
-          <a class="cta" href="mailto:kontakt@veodevelopment.pl">Wyślij wiadomość</a>
+          <a class="cta" href="mailto:kontakt@veodevelopment.pl">Wyślij wiadomość<svg class="cta-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4,12 L12,4 M6,4 H12 V10"/></svg></a>
         </div>
       </div>
     </div>

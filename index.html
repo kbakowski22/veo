@@ -29,6 +29,7 @@
     --dark-2:  #252521;
     --dark-line: #3d3b36;
     --dark-muted: #aaa59b;
+    --ink-soft: #3a362e;
     --serif: 'DM Serif Display', Georgia, serif;
     --sans:  'DM Sans', Arial, sans-serif;
     color-scheme: light;
@@ -186,7 +187,7 @@
 
   /* ---------- section head / two-col ---------- */
   .manifesto{ display:grid; grid-template-columns:1fr 1.7fr; gap:70px; }
-  .manifesto h2{ font-size:clamp(40px, 5.6vw, 72px); line-height:1; letter-spacing:-.03em; }
+  .manifesto h2{ font-size:clamp(40px, 5.6vw, 72px); line-height:1; letter-spacing:-.03em; color:var(--ink-soft); }
   .manifesto p{ max-width:600px; font-size:20px; color:#45423d; line-height:1.55; }
   .manifesto p + p{ margin-top:20px; font-size:17px; color:var(--muted); }
 
@@ -200,7 +201,8 @@
   .quote p{ font-family:var(--serif); font-style:italic; font-size:clamp(20px, 2.4vw, 26px); line-height:1.35; color:var(--ink); }
 
   .two-col{ display:grid; grid-template-columns:.8fr 1.4fr; gap:100px; }
-  .bigstatement{ font:400 clamp(38px, 5.2vw, 64px)/1.04 var(--serif); letter-spacing:-.03em; }
+  .bigstatement{ font:400 clamp(38px, 5.2vw, 64px)/1.04 var(--serif); letter-spacing:-.03em; color:var(--ink-soft); }
+  .dark .bigstatement{ color:var(--paper); }
   .copy{ font-size:19px; max-width:610px; color:#4c4942; }
   .dark .copy{ color:#d0cbc2; }
 
@@ -221,6 +223,9 @@
   }
   .feature b{ font:400 38px var(--serif); display:block; margin-bottom:42px; color:var(--muted); transition:color .3s ease; }
   .feature:hover b{ color:var(--ink); }
+  .feature .ficon{ display:block; margin-bottom:42px; }
+  .feature .ficon svg{ width:38px; height:38px; display:block; fill:none; stroke:var(--muted); stroke-width:2; transition:stroke .3s ease; }
+  .feature:hover .ficon svg{ stroke:var(--ink); }
   .feature h3{ font-size:13px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
   .feature p{ color:var(--muted); font-size:14px; max-width:250px; }
   @media (max-width:800px){ .feature-grid{ grid-template-columns:1fr; } }
@@ -245,7 +250,7 @@
   .journey{ margin-top:80px; border-top:1px solid var(--dark-line); }
   .journey-row{
     display:grid;
-    grid-template-columns:70px 1fr 1.4fr auto;
+    grid-template-columns:18px 70px 1fr 1.4fr auto;
     gap:20px;
     align-items:center;
     padding:26px 0;
@@ -262,6 +267,15 @@
   @media (prefers-reduced-motion: reduce){
     .journey-row{ opacity:1; transform:none; transition:none; }
   }
+  .journey-row .step-dot{ width:10px; height:10px; border-radius:50%; border:2px solid var(--dark-muted); box-sizing:border-box; position:relative; }
+  .journey-row.done .step-dot{ background:var(--paper); border-color:var(--paper); }
+  .journey-row.active .step-dot{ border-color:#c9a876; }
+  .journey-row.active .step-dot::after{
+    content:''; position:absolute; inset:-6px; border-radius:50%;
+    border:2px solid #c9a876; animation:stepPulse 2s ease-out infinite;
+  }
+  @keyframes stepPulse{ 0%{ transform:scale(.6); opacity:.9; } 100%{ transform:scale(1.7); opacity:0; } }
+  @media (prefers-reduced-motion: reduce){ .journey-row.active .step-dot::after{ animation:none; opacity:.5; } }
   .journey-row .num{ font:400 28px var(--serif); color:var(--dark-muted); transition:color .3s ease; }
   .journey-row:hover .num{ color:var(--paper); }
   .journey-row h3{ font-size:14px; letter-spacing:.1em; text-transform:uppercase; }
@@ -274,14 +288,17 @@
   .journey-row.done .tag{ background:var(--paper); }
   .journey-row.active .tag{ background:#c9a876; color:var(--dark); }
   @media (max-width:800px){
-    .journey-row{ grid-template-columns:40px 1fr; gap:8px 14px; }
-    .journey-row p{ grid-column:2; }
-    .journey-row .tag{ grid-column:2; justify-self:start; margin-top:6px; }
+    .journey-row{ grid-template-columns:14px 40px 1fr; gap:8px 14px; }
+    .journey-row p{ grid-column:3; }
+    .journey-row .tag{ grid-column:3; justify-self:start; margin-top:6px; }
   }
 
   /* ---------- final statement ---------- */
-  .final{ min-height:60vh; display:flex; align-items:center; }
-  .final h2{ font:400 clamp(56px, 9vw, 128px)/.92 var(--serif); letter-spacing:-.04em; }
+  .final{ min-height:60vh; display:flex; align-items:center; position:relative; overflow:hidden; }
+  .final-deco{ position:absolute; top:40px; right:40px; width:220px; height:220px; pointer-events:none; z-index:0; }
+  .final > .wrap{ position:relative; z-index:1; }
+  @media (max-width:800px){ .final-deco{ display:none; } }
+  .final h2{ font:400 clamp(56px, 9vw, 128px)/.92 var(--serif); letter-spacing:-.04em; color:var(--ink-soft); }
   .final-countdown{ display:flex; gap:clamp(24px,4vw,48px); margin-top:44px; flex-wrap:wrap; }
   .final-countdown .unit{ display:flex; flex-direction:column; gap:6px; perspective:220px; }
   .final-countdown .num{
@@ -540,9 +557,9 @@
         </div>
       </div>
       <div class="feature-grid">
-        <div class="feature"><b>01</b><h3>Kontekst</h3><p>Zanim narysujemy pierwszą linię, poznajemy działkę: nasłonecznienie, sąsiedztwo, historię terenu.</p></div>
-        <div class="feature"><b>02</b><h3>Materiały</h3><p>Cegła, drewno, naturalny kamień — dobrane tak, by nie wymagały kompromisów za dwadzieścia lat.</p></div>
-        <div class="feature"><b>03</b><h3>Skala</h3><p>Dwa lokale, nie dwadzieścia. Tyle, żeby każdy szczegół dało się dopilnować osobiście.</p></div>
+        <div class="feature"><span class="ficon" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M4,20 L20,6 L36,20"/><path d="M8,18 V34 H32 V18"/></svg></span><h3>Kontekst</h3><p>Zanim narysujemy pierwszą linię, poznajemy działkę: nasłonecznienie, sąsiedztwo, historię terenu.</p></div>
+        <div class="feature"><span class="ficon" aria-hidden="true"><svg viewBox="0 0 40 40"><polygon points="20,4 34,12 20,20 6,12"/><polygon points="20,14 34,22 20,30 6,22"/><polygon points="20,24 34,32 20,40 6,32"/></svg></span><h3>Materiały</h3><p>Cegła, drewno, naturalny kamień — dobrane tak, by nie wymagały kompromisów za dwadzieścia lat.</p></div>
+        <div class="feature"><span class="ficon" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="15" cy="20" r="12"/><circle cx="25" cy="20" r="12"/></svg></span><h3>Skala</h3><p>Dwa lokale, nie dwadzieścia. Tyle, żeby każdy szczegół dało się dopilnować osobiście.</p></div>
       </div>
     </div>
   </section>
@@ -554,24 +571,28 @@
         <h2 class="serif" style="font-size:clamp(38px,5vw,64px);margin-top:24px">Cztery etapy.<br>Zero skrótów.</h2>
         <div class="journey">
           <div class="journey-row done">
+            <span class="step-dot" aria-hidden="true"></span>
             <span class="num">01</span>
             <h3>Grunt</h3>
             <p>Działka pod pierwszą inwestycję jest już nasza.</p>
             <span class="tag">Zakończone</span>
           </div>
           <div class="journey-row active">
+            <span class="step-dot" aria-hidden="true"></span>
             <span class="num">02</span>
             <h3>Projekt</h3>
             <p>Szukamy pracowni architektonicznej. Koncepcja gotowa jesienią 2026.</p>
             <span class="tag">W trakcie</span>
           </div>
           <div class="journey-row">
+            <span class="step-dot" aria-hidden="true"></span>
             <span class="num">03</span>
             <h3>Pozwolenia</h3>
             <p>Formalności administracyjne i uzyskanie pozwolenia na budowę.</p>
             <span class="tag">Zima 2026</span>
           </div>
           <div class="journey-row">
+            <span class="step-dot" aria-hidden="true"></span>
             <span class="num">04</span>
             <h3>Realizacja</h3>
             <p>Start prac budowlanych, zgodnie z przyjętymi standardami jakości.</p>
@@ -583,6 +604,13 @@
   </section>
 
   <section class="section final">
+    <svg class="final-deco" viewBox="0 0 220 220" aria-hidden="true">
+      <g opacity="0.15" stroke="var(--ink)" stroke-width="1" fill="none">
+        <line x1="0" y1="60" x2="0" y2="220"/>
+        <line x1="0" y1="60" x2="160" y2="60"/>
+        <circle cx="0" cy="60" r="3" fill="var(--ink)" stroke="none"/>
+      </g>
+    </svg>
     <div class="wrap reveal">
       <div class="eyebrow">Veo Development</div>
       <h2 class="serif" style="margin-top:24px">Wiosna<br><i>2027.</i></h2>

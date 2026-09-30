@@ -482,13 +482,15 @@
   .curtain{
     position:fixed; inset:0; z-index:100; background:var(--dark);
     display:flex; align-items:center; justify-content:center;
-    transition:transform .9s cubic-bezier(.16,.8,.24,1) .15s;
+    transition:transform 1.3s cubic-bezier(.16,.8,.24,1) .15s;
   }
   .curtain-mark{
-    width:120px; height:auto; filter:invert(1) brightness(1.6);
-    opacity:1; transform:scale(1);
-    transition:opacity .4s ease, transform .4s ease;
+    width:130px; height:auto; filter:invert(1) brightness(1.6);
+    opacity:0; transform:scale(.9);
+    animation:curtainMarkIn .7s ease .15s forwards;
+    transition:opacity .5s ease, transform .5s ease;
   }
+  @keyframes curtainMarkIn{ to{ opacity:1; transform:scale(1); } }
   .curtain.animate{ transform:translateY(-100%); }
   .curtain.animate .curtain-mark{ opacity:0; transform:scale(.85); }
   .curtain.hidden{ display:none; }
@@ -795,11 +797,10 @@
         curtain.classList.add('hidden');
       });
     }
-    if(document.fonts && document.fonts.ready){
-      Promise.race([document.fonts.ready, new Promise(function(r){ setTimeout(r, 800); })]).then(reveal);
-    } else {
-      setTimeout(reveal, 400);
-    }
+    var MIN_HOLD = 1500;
+    var fontsPromise = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    var holdPromise = new Promise(function(r){ setTimeout(r, MIN_HOLD); });
+    Promise.all([fontsPromise, holdPromise]).then(reveal);
   }catch(e){}
 })();
 

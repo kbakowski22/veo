@@ -1,0 +1,394 @@
+@import "tailwindcss";
+
+/* ───────────── Tokeny designu Res Privata ───────────── */
+@theme {
+  --color-paper: #f5f3ef;
+  --color-paper-alt: #ece8e1;
+  --color-card: #ffffff;
+  --color-ink: #121212;
+  --color-ink-2: #4a4741;
+  --color-ink-3: #6b6760;
+  --color-line: #d6d1c8;
+  --color-accent: #1f3d2e;
+  --color-accent-light: #a8c3b3;
+  --color-dark: #121212;
+  --color-on-dark: #f5f3ef;
+  --color-on-dark-2: #bdb8af;
+  --color-line-dark: #34322e;
+  --color-error: #9b2c1f;
+  --color-error-on-dark: #f2b8ad;
+
+  --radius-card: 24px;
+  --radius-card-lg: 28px;
+
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* ───────────── Baza ───────────── */
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 88px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    line-height: 1.55;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-on-dark);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  .on-dark :focus-visible,
+  .on-accent :focus-visible {
+    outline-color: var(--color-accent-light);
+  }
+}
+
+/* ───────────── Typografia ───────────── */
+@layer components {
+  .label-mono {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  .h1 {
+    font-weight: 500;
+    font-size: clamp(56px, 9vw, 136px);
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+  .h2 {
+    font-weight: 500;
+    font-size: clamp(40px, 6.2vw, 92px);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+  .h3 {
+    font-weight: 500;
+    font-size: clamp(24px, 2.4vw, 32px);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+  }
+  /* Druga linia nagłówka: lżejsza waga w kolorze akcentu (zamiast kursywy). */
+  .headline-soft {
+    display: block;
+    font-weight: 300;
+    color: var(--color-accent);
+  }
+  .on-dark .headline-soft,
+  .on-accent .headline-soft {
+    color: var(--color-accent-light);
+  }
+
+  .container-rp {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 640px) {
+    .container-rp {
+      padding-inline: 32px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container-rp {
+      padding-inline: 48px;
+    }
+  }
+
+  /* ───────────── Przyciski (pill) ───────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    min-height: 48px;
+    padding: 0 1.5rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease,
+      transform 0.25s var(--ease-out-soft);
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn[disabled] {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-on-dark);
+  }
+  .btn-primary:hover {
+    background: #16301f;
+  }
+  .btn-secondary {
+    border: 1px solid var(--color-ink);
+    color: var(--color-ink);
+  }
+  .btn-secondary:hover {
+    background: var(--color-ink);
+    color: var(--color-on-dark);
+  }
+  .btn-light {
+    background: var(--color-on-dark);
+    color: var(--color-ink);
+  }
+  .btn-light:hover {
+    background: #ffffff;
+  }
+  .btn-ghost-light {
+    border: 1px solid rgba(245, 243, 239, 0.4);
+    color: var(--color-on-dark);
+  }
+  .btn-ghost-light:hover {
+    border-color: var(--color-on-dark);
+  }
+  .btn-sm {
+    min-height: 40px;
+    padding: 0 1.1rem;
+    font-size: 14px;
+  }
+
+  /* ───────────── Formularze ───────────── */
+  .field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+  .field {
+    width: 100%;
+    min-height: 52px;
+    padding: 0.8rem 1.1rem;
+    border-radius: 16px;
+    border: 1px solid var(--color-line);
+    background: var(--color-card);
+    color: var(--color-ink);
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+  }
+  .field:hover {
+    border-color: var(--color-ink-3);
+  }
+  .field:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+    border-color: var(--color-accent);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-error);
+  }
+  textarea.field {
+    min-height: 140px;
+    resize: vertical;
+  }
+
+  /* Pułapka na boty – niewidoczna, ale nie display:none (część botów to wykrywa). */
+  .hp-field {
+    position: absolute !important;
+    left: -10000px !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* ───────────── Karty ───────────── */
+  .lift {
+    transition:
+      transform 0.45s var(--ease-out-soft),
+      box-shadow 0.45s var(--ease-out-soft);
+  }
+  @media (hover: hover) {
+    .lift:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 48px -28px rgba(18, 18, 18, 0.28);
+    }
+  }
+
+  /* ───────────── Suwak kalkulatora ───────────── */
+  .range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 28px;
+    background: transparent;
+    cursor: pointer;
+    --fill: 50%;
+  }
+  .range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: linear-gradient(to right, var(--color-accent) var(--fill), var(--color-line) var(--fill));
+  }
+  .range::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--color-line);
+  }
+  .range::-moz-range-progress {
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--color-accent);
+  }
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    margin-top: -10px;
+    border-radius: 9999px;
+    background: var(--color-card);
+    border: 2px solid var(--color-accent);
+    box-shadow: 0 2px 8px rgba(18, 18, 18, 0.15);
+    transition: transform 0.2s ease;
+  }
+  .range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    background: var(--color-card);
+    border: 2px solid var(--color-accent);
+  }
+  .range:active::-webkit-slider-thumb {
+    transform: scale(1.12);
+  }
+  .range:focus-visible {
+    outline: none;
+  }
+  .range:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+  .range:focus-visible::-moz-range-thumb {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+}
+
+/* ───────────── Ruch ───────────── */
+@keyframes rp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes rp-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes rp-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes rp-marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Wjazd elementów hero; --i = kolejność, opóźnienie 0.12s na krok. */
+  .rise {
+    animation: rp-rise 1s var(--ease-out-soft) both;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+  }
+
+  /* Rysujące się linie łuków (pathLength="1"). */
+  .draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: rp-draw 2.2s var(--ease-out-soft) forwards;
+    animation-delay: calc(0.3s + var(--i, 0) * 0.18s);
+  }
+  .draw-fill {
+    animation: rp-fade 1.4s ease both;
+    animation-delay: 1.6s;
+  }
+
+  .marquee-track {
+    animation: rp-marquee 38s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Sekcje pojawiające się przy przewijaniu. Ukrywamy je tylko, gdy działa JS. */
+  html.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+      opacity 0.9s var(--ease-out-soft),
+      transform 0.9s var(--ease-out-soft);
+    transition-delay: calc(var(--i, 0) * 0.1s);
+  }
+  html.js [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .marquee-track {
+    width: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .marquee-track > ul {
+    flex-shrink: 1;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 0.5rem;
+  }
+  .marquee-track > [aria-hidden="true"] {
+    display: none;
+  }
+}

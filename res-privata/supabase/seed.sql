@@ -1,0 +1,1 @@
+-- Dane lokalne/testowe. Dane demo (oznaczone DEMO) dojdą w etapie 9.

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LogoMark } from "@/components/brand/Logo";
+import { Suspense } from "react";
+import { LinkError } from "./LinkError";
 import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = { title: "Logowanie", robots: { index: false } };
@@ -14,6 +16,9 @@ export default function LoginPage() {
         <p className="mt-3 leading-relaxed text-ink-2">
           Bez hasła. Wyślemy Ci jednorazowy link do logowania.
         </p>
+        <Suspense fallback={null}>
+          <LinkError />
+        </Suspense>
         <div className="mt-8">
           <LoginForm />
         </div>

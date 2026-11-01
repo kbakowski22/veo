@@ -46,3 +46,16 @@ test.describe("Menu mobilne", () => {
     await expect(page.getByRole("navigation", { name: "Menu mobilne" })).toBeHidden();
   });
 });
+
+test.describe("Ochrona panelu", () => {
+  test("niezalogowany użytkownik trafia z /panel na logowanie", async ({ page }) => {
+    await page.goto("/panel");
+    await expect(page).toHaveURL(/\/logowanie$/);
+    await expect(page.getByRole("heading", { name: "Zaloguj się" })).toBeVisible();
+  });
+
+  test("wygasły link pokazuje komunikat", async ({ page }) => {
+    await page.goto("/logowanie?blad=link");
+    await expect(page.getByRole("alert").filter({ hasText: "Link logowania wygasł" })).toBeVisible();
+  });
+});

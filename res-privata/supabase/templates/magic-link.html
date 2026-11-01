@@ -1,0 +1,38 @@
+<!--
+  Szablon maila logowania dla Supabase.
+  Wklej w: Supabase → Authentication → Email Templates → Magic Link (oraz „Confirm signup”).
+  Temat: Twój link do logowania · Res Privata
+-->
+<!DOCTYPE html>
+<html lang="pl">
+  <body style="margin:0;padding:32px 0;background:#F5F3EF;font-family:Geist,'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;padding:0 16px;">
+            <tr>
+              <td style="padding:8px 0 24px;">
+                <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                  <td style="width:18px;height:18px;background:#1F3D2E;"></td>
+                  <td style="padding-left:10px;font-size:12px;font-weight:600;letter-spacing:0.24em;color:#121212;">RES PRIVATA</td>
+                </tr></table>
+              </td>
+            </tr>
+            <tr>
+              <td style="background:#FFFFFF;border:1px solid #D6D1C8;border-radius:20px;padding:36px 32px;">
+                <p style="margin:0 0 12px;font-family:'Geist Mono',Menlo,monospace;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:#1F3D2E;">Logowanie</p>
+                <p style="margin:0 0 16px;font-size:28px;line-height:32px;font-weight:500;letter-spacing:-0.03em;color:#121212;">Twój link do logowania.</p>
+                <p style="margin:0 0 24px;font-size:15px;line-height:24px;color:#4A4741;">Kliknij przycisk poniżej, aby zalogować się do Res Privata. Link jest jednorazowy i ważny przez godzinę.</p>
+                <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email" style="display:inline-block;background:#1F3D2E;color:#F5F3EF;border-radius:999px;padding:14px 26px;font-size:15px;font-weight:500;text-decoration:none;">Zaloguj się</a>
+                <p style="margin:24px 0 0;font-size:13px;line-height:20px;color:#6B6760;">Jeśli to nie Ty prosiłeś o link, zignoruj tę wiadomość.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 4px 0;font-size:12px;line-height:18px;color:#6B6760;">Res Privata · Polska</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

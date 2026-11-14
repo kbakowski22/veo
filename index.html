@@ -810,12 +810,10 @@
   }catch(e){}
 })();
 
-/* particle stage: WebGL ambient field that assembles into the VEO mark over the hero
-   and into a ring over the final countdown, in rhythm with scroll (inspired by
-   businessprogramme.ai's "Scena" effect, scaled down to two hand-built shapes).
-   Desktop/tablet only — phones consistently struggled with this even at reduced
-   particle counts, so it's skipped entirely below the site's mobile breakpoint
-   rather than tuned further (same call made earlier for Lenis on this page). */
+/* particle stage: WebGL ambient field — subtle dots drifting across the whole page
+   (businessprogramme.ai-style ambience, without their shape-morphing). Desktop/tablet
+   only — phones consistently struggled with this even scaled down, so it's skipped
+   entirely below the site's mobile breakpoint (same call made for Lenis earlier). */
 (function(){
   try{
     var canvas = document.getElementById('particleStage');
@@ -831,8 +829,6 @@
 
     var VERT = [
       'attribute vec2 aAmbient;',
-      'attribute vec2 aShapeA;',
-      'attribute vec2 aShapeB;',
       'attribute float aSeed;',
       'attribute float aSize;',
       'uniform float uTime;',
@@ -840,11 +836,6 @@
       'uniform float uDocH;',
       'uniform float uViewportW;',
       'uniform float uViewportH;',
-      'uniform float uModeA;',
-      'uniform float uModeB;',
-      'uniform vec2 uLogoOffset;',
-      'uniform vec2 uMouse;',
-      'uniform float uMouseStrength;',
       'uniform float uDpr;',
       'uniform vec2 uDarkZones[6];',
       'uniform int uDarkZoneCount;',
@@ -863,15 +854,7 @@
       '    if (i >= uDarkZoneCount) break;',
       '    if (yFrac >= uDarkZones[i].x && yFrac <= uDarkZones[i].y) vIsDark = 1.0;',
       '  }',
-      '  vec2 ambientNDC = vec2((screenXpx / uViewportW) * 2.0 - 1.0, 1.0 - (screenYpx / uViewportH) * 2.0);',
-      '  vec2 mouseNDC = vec2((uMouse.x / uViewportW) * 2.0 - 1.0, 1.0 - (uMouse.y / uViewportH) * 2.0);',
-      '  vec2 toP = ambientNDC - mouseNDC;',
-      '  float d = length(toP) + 0.0001;',
-      '  float falloff = clamp(1.0 - d / 0.25, 0.0, 1.0);',
-      '  vec2 repel = normalize(toP) * falloff * falloff * 0.12 * uMouseStrength * (1.0 - clamp(uModeA + uModeB, 0.0, 1.0));',
-      '  vec2 basePos = ambientNDC + repel;',
-      '  vec2 pos = mix(basePos, aShapeA + uLogoOffset, uModeA);',
-      '  pos = mix(pos, aShapeB, uModeB);',
+      '  vec2 pos = vec2((screenXpx / uViewportW) * 2.0 - 1.0, 1.0 - (screenYpx / uViewportH) * 2.0);',
       '  gl_Position = vec4(pos, 0.0, 1.0);',
       '  gl_PointSize = aSize * uDpr;',
       '}'
@@ -905,79 +888,6 @@
     if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){ throw new Error(gl.getProgramInfoLog(prog)); }
     gl.useProgram(prog);
 
-    function genLogo(n){
-      /* traced directly from assets/logo-mark-transparent.png (707x230px) so the
-         particle shape matches the real brand mark: V, the three Xi bars, and the
-         O ring, at their measured pixel proportions, positions and stroke widths */
-      var cx = 353.5, cy = 112.5; /* Xi's middle bar center, so the decorative circle's horizontal line lands on it exactly */
-      var scale = 0.42 / 330.5;
-      function toN(x, y){ return [(x - cx) * scale, -(y - cy) * scale]; }
-
-      var pts = [];
-
-      function addStroke(x0, y0, x1, y1, count, halfWidthPx){
-        var dx = x1 - x0, dy = y1 - y0;
-        var len = Math.sqrt(dx * dx + dy * dy);
-        var nx = -dy / len, ny = dx / len;
-        for(var i = 0; i < count; i++){
-          var t = Math.random();
-          var x = x0 + dx * t, y = y0 + dy * t;
-          var off = (Math.random() * 2 - 1) * halfWidthPx * (0.4 + 0.6 * Math.random());
-          x += nx * off; y += ny * off;
-          var p = toN(x, y);
-          pts.push(p[0], p[1]);
-        }
-      }
-
-      /* V: top-left (24,26) and top-right (201,26) converging to the apex (115.5,202.5) */
-      var vCount = Math.round(n * 0.29);
-      var halfV = Math.floor(vCount / 2);
-      addStroke(24, 26, 115.5, 202.5, halfV, 4);
-      addStroke(201, 26, 115.5, 202.5, vCount - halfV, 4);
-
-      /* Xi: three filled horizontal bars, the middle one shorter on the right (thinned
-         toward each bar's own centerline for a lighter, airier stroke) */
-      var xiCount = Math.round(n * 0.21);
-      var bars = [
-        { x0:286, x1:407, y0:28, y1:36 },
-        { x0:286, x1:394, y0:109.5, y1:115.5 },
-        { x0:287, x1:407, y0:192, y1:200 }
-      ];
-      var areas = bars.map(function(b){ return (b.x1 - b.x0) * (b.y1 - b.y0); });
-      var areaSum = areas[0] + areas[1] + areas[2];
-      for(var bi = 0; bi < 3; bi++){
-        var b = bars[bi];
-        var count = Math.round(xiCount * areas[bi] / areaSum);
-        for(var i = 0; i < count; i++){
-          var x = b.x0 + Math.random() * (b.x1 - b.x0);
-          var y = b.y0 + Math.random() * (b.y1 - b.y0);
-          var p = toN(x, y);
-          pts.push(p[0], p[1]);
-        }
-      }
-
-      /* O: filled ring, outer radius ~94.5px, thinned to ~11.5px stroke for a lighter feel */
-      var ocx = 589.5, ocy = 114.5, rOuter = 94.5, rInner = 83;
-      var oCount = n - (pts.length / 2);
-      for(var j = 0; j < oCount; j++){
-        var a = Math.random() * Math.PI * 2;
-        var r = Math.sqrt(rInner * rInner + Math.random() * (rOuter * rOuter - rInner * rInner));
-        var x2 = ocx + Math.cos(a) * r, y2 = ocy + Math.sin(a) * r;
-        var p2 = toN(x2, y2);
-        pts.push(p2[0], p2[1]);
-      }
-      return pts;
-    }
-    function genRing(n){
-      var pts = [];
-      for(var i = 0; i < n; i++){
-        var a = (i / n) * Math.PI * 2;
-        var r = 0.4 + (Math.random() - 0.5) * 0.03;
-        pts.push(Math.cos(a) * r, Math.sin(a) * r * 0.82);
-      }
-      return pts;
-    }
-
     function makeBuf(data, itemSize, attrName){
       var buf = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -991,8 +901,6 @@
     var HIGH_N = N, LOW_N = 9000, LOWER_N = 4500;
     function buildParticles(count){
       N = count;
-      var shapeA = genLogo(N);
-      var shapeB = genRing(N);
       var ambient = new Float32Array(N * 2);
       var seeds = new Float32Array(N);
       var sizes = new Float32Array(N);
@@ -1003,16 +911,13 @@
         sizes[i] = 0.7 + Math.pow(Math.random(), 1.8) * 1.5;
       }
       makeBuf(ambient, 2, 'aAmbient');
-      makeBuf(shapeA, 2, 'aShapeA');
-      makeBuf(shapeB, 2, 'aShapeB');
       makeBuf(seeds, 1, 'aSeed');
       makeBuf(sizes, 1, 'aSize');
     }
     buildParticles(HIGH_N);
-    var qualityChecked = false;
 
     var u = {};
-    ['uTime','uScrollY','uDocH','uViewportW','uViewportH','uModeA','uModeB','uLogoOffset','uMouse','uMouseStrength','uDpr','uDarkZones','uDarkZoneCount','uLightColor','uDarkColor'].forEach(function(name){
+    ['uTime','uScrollY','uDocH','uViewportW','uViewportH','uDpr','uDarkZones','uDarkZoneCount','uLightColor','uDarkColor'].forEach(function(name){
       u[name] = gl.getUniformLocation(prog, name);
     });
 
@@ -1040,42 +945,6 @@
     }
     measure();
 
-    var logoOffset = [0, 0];
-    var logoCircleEl = document.querySelector('.hero-lines circle');
-    function updateLogoOffset(){
-      if(!logoCircleEl){ return; }
-      var cr = logoCircleEl.getBoundingClientRect();
-      var ccx = cr.left + cr.width / 2, ccy = cr.top + cr.height / 2;
-      logoOffset[0] = (ccx / vw) * 2 - 1;
-      logoOffset[1] = 1 - (ccy / vh) * 2;
-    }
-
-    var heroEl = document.getElementById('heroSection');
-    var finalEl = document.querySelector('.final');
-    function zoneRange(el){
-      if(!el) return [-1e9, -1e9];
-      var r = el.getBoundingClientRect();
-      var scrollY = window.scrollY || window.pageYOffset;
-      return [r.top + scrollY, r.bottom + scrollY];
-    }
-    var heroZone = zoneRange(heroEl);
-    var finalZone = zoneRange(finalEl);
-
-    function bump(center, zoneTop, zoneBottom){
-      var zc = (zoneTop + zoneBottom) / 2;
-      var zh = Math.max(1, (zoneBottom - zoneTop) / 2);
-      var dist = Math.abs(center - zc);
-      return Math.max(0, 1 - dist / zh);
-    }
-
-    var mouse = { x: -1000, y: -1000 };
-    var mouseStrength = 0;
-    if(window.matchMedia('(pointer: fine)').matches){
-      window.addEventListener('pointermove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; mouseStrength = 1; }, { passive:true });
-      window.addEventListener('pointerleave', function(){ mouseStrength = 0; });
-    }
-
-    var curModeA = 0, curModeB = 0;
     var running = true;
     var startTime = performance.now();
     var frameCount = 0, framesAtStage = 0, timeAtStage = 0;
@@ -1088,8 +957,6 @@
       var now = performance.now();
       var time = (now - startTime) / 1000;
       var scrollY = window.scrollY || window.pageYOffset;
-      var center = scrollY + vh / 2;
-      updateLogoOffset();
 
       frameCount++;
       if(qualityStage === 0 && frameCount >= CHECK1_AT){
@@ -1102,22 +969,12 @@
         qualityStage = 2;
       }
 
-      var targetA = bump(center, heroZone[0], heroZone[1]);
-      var targetB = bump(center, finalZone[0], finalZone[1]);
-      curModeA += (targetA - curModeA) * 0.06;
-      curModeB += (targetB - curModeB) * 0.06;
-
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform1f(u.uTime, time);
       gl.uniform1f(u.uScrollY, scrollY);
       gl.uniform1f(u.uDocH, docH);
       gl.uniform1f(u.uViewportW, vw);
       gl.uniform1f(u.uViewportH, vh);
-      gl.uniform1f(u.uModeA, curModeA);
-      gl.uniform1f(u.uModeB, curModeB);
-      gl.uniform2f(u.uLogoOffset, logoOffset[0], logoOffset[1]);
-      gl.uniform2f(u.uMouse, mouse.x, mouse.y);
-      gl.uniform1f(u.uMouseStrength, mouseStrength);
       gl.uniform1f(u.uDpr, dpr);
       gl.uniform3f(u.uLightColor, 0.09, 0.09, 0.08);
       gl.uniform3f(u.uDarkColor, 0.95, 0.94, 0.91);
@@ -1133,11 +990,7 @@
     var resizeTimer;
     window.addEventListener('resize', function(){
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function(){
-        measure();
-        heroZone = zoneRange(heroEl);
-        finalZone = zoneRange(finalEl);
-      }, 200);
+      resizeTimer = setTimeout(measure, 200);
     }, { passive:true });
 
     document.addEventListener('visibilitychange', function(){

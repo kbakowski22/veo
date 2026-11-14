@@ -495,6 +495,10 @@
   .curtain.animate .curtain-mark{ opacity:0; transform:scale(.85); }
   .curtain.hidden{ display:none; }
   @media (prefers-reduced-motion: reduce){ .curtain{ display:none; } }
+
+  /* ---------- ambient particle field: sparse drifting grains, Canvas2D ---------- */
+  .particles-field{ position:fixed; inset:0; z-index:16; pointer-events:none; }
+  @media (prefers-reduced-motion: reduce){ .particles-field{ display:none; } }
 </style>
 </head>
 <body>
@@ -509,6 +513,8 @@
     <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
   </svg>
 </div>
+
+<canvas class="particles-field" id="particles" aria-hidden="true"></canvas>
 
 <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -801,6 +807,104 @@
     var fontsPromise = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
     var holdPromise = new Promise(function(r){ setTimeout(r, MIN_HOLD); });
     Promise.all([fontsPromise, holdPromise]).then(reveal);
+  }catch(e){}
+})();
+
+/* ambient particle field: sparse drifting grains across the page (Canvas2D, no WebGL) */
+(function(){
+  try{
+    var canvas = document.getElementById('particles');
+    if(!canvas) return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var ctx = canvas.getContext('2d');
+    if(!ctx) return;
+
+    var vw, vh, dpr, docH, darkRanges = [];
+    var LIGHT_DOT = 'rgba(23,23,21,0.3)';
+    var DARK_DOT = 'rgba(243,240,233,0.35)';
+
+    function measureDarkSections(){
+      darkRanges = [];
+      var scrollY = window.scrollY || window.pageYOffset;
+      Array.prototype.slice.call(document.querySelectorAll('.dark')).forEach(function(el){
+        var r = el.getBoundingClientRect();
+        darkRanges.push([r.top + scrollY, r.bottom + scrollY]);
+      });
+    }
+    function isDarkAt(worldY){
+      for(var i = 0; i < darkRanges.length; i++){
+        if(worldY >= darkRanges[i][0] && worldY <= darkRanges[i][1]) return true;
+      }
+      return false;
+    }
+
+    function resize(){
+      vw = window.innerWidth; vh = window.innerHeight;
+      docH = document.documentElement.scrollHeight;
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = Math.round(vw * dpr);
+      canvas.height = Math.round(vh * dpr);
+      canvas.style.width = vw + 'px';
+      canvas.style.height = vh + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      measureDarkSections();
+    }
+
+    function makeParticle(){
+      var y = Math.random() * docH;
+      return {
+        x: Math.random() * vw,
+        y: y,
+        vx: (Math.random() - 0.5) * 0.08,
+        vy: -0.05 - Math.random() * 0.12,
+        r: 0.6 + Math.random() * 1.4,
+        dark: isDarkAt(y)
+      };
+    }
+
+    resize();
+    var isMobile = window.matchMedia('(max-width: 800px)').matches;
+    var COUNT = isMobile ? 60 : 120;
+    var particles = [];
+    for(var i = 0; i < COUNT; i++) particles.push(makeParticle());
+
+    var running = true;
+    function frame(){
+      if(!running) return;
+      requestAnimationFrame(frame);
+      var scrollY = window.scrollY || window.pageYOffset;
+      ctx.clearRect(0, 0, vw, vh);
+      for(var j = 0; j < particles.length; j++){
+        var p = particles[j];
+        p.x += p.vx; p.y += p.vy;
+        if(p.y < 0) p.y = docH;
+        if(p.y > docH) p.y = 0;
+        if(p.x < 0) p.x = vw;
+        if(p.x > vw) p.x = 0;
+        var screenY = p.y - scrollY;
+        if(screenY < -10 || screenY > vh + 10) continue;
+        ctx.beginPath();
+        ctx.arc(p.x, screenY, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.dark ? DARK_DOT : LIGHT_DOT;
+        ctx.fill();
+      }
+    }
+
+    var resizeTimer;
+    window.addEventListener('resize', function(){
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function(){
+        resize();
+        particles.forEach(function(p){ p.dark = isDarkAt(p.y); });
+      }, 200);
+    }, { passive: true });
+
+    document.addEventListener('visibilitychange', function(){
+      running = !document.hidden;
+      if(running) requestAnimationFrame(frame);
+    });
+
+    requestAnimationFrame(frame);
   }catch(e){}
 })();
 

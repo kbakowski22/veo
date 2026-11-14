@@ -496,9 +496,9 @@
   .curtain.hidden{ display:none; }
   @media (prefers-reduced-motion: reduce){ .curtain{ display:none; } }
 
-  /* ---------- ambient particle field: sparse drifting grains, Canvas2D ---------- */
-  .particles-field{ position:fixed; inset:0; z-index:16; pointer-events:none; }
-  @media (prefers-reduced-motion: reduce){ .particles-field{ display:none; } }
+  /* ---------- particle stage: WebGL ambient field + scroll-tied shape assembly ---------- */
+  .particle-stage{ position:fixed; inset:0; z-index:16; pointer-events:none; }
+  @media (prefers-reduced-motion: reduce){ .particle-stage{ display:none; } }
 </style>
 </head>
 <body>
@@ -514,7 +514,7 @@
   </svg>
 </div>
 
-<canvas class="particles-field" id="particles" aria-hidden="true"></canvas>
+<canvas class="particle-stage" id="particleStage" aria-hidden="true"></canvas>
 
 <div class="scroll-progress" id="scrollProgress"></div>
 
@@ -810,35 +810,158 @@
   }catch(e){}
 })();
 
-/* ambient particle field: sparse drifting grains across the page (Canvas2D, no WebGL) */
+/* particle stage: WebGL ambient field that assembles into the V-mark over the hero
+   and into a ring over the final countdown, in rhythm with scroll (inspired by
+   businessprogramme.ai's "Scena" effect, scaled down to two hand-built shapes) */
 (function(){
   try{
-    var canvas = document.getElementById('particles');
+    var canvas = document.getElementById('particleStage');
     if(!canvas) return;
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    var ctx = canvas.getContext('2d');
-    if(!ctx) return;
 
-    var vw, vh, dpr, docH, darkRanges = [];
-    var LIGHT_DOT = 'rgba(23,23,21,0.3)';
-    var DARK_DOT = 'rgba(243,240,233,0.35)';
+    var GL_OPTS = { alpha:true, premultipliedAlpha:false, antialias:false, depth:false, stencil:false, preserveDrawingBuffer:false, powerPreference:'high-performance' };
+    var gl = canvas.getContext('webgl', GL_OPTS) || canvas.getContext('experimental-webgl', GL_OPTS);
+    if(!gl){ canvas.remove(); return; }
 
-    function measureDarkSections(){
-      darkRanges = [];
-      var scrollY = window.scrollY || window.pageYOffset;
-      Array.prototype.slice.call(document.querySelectorAll('.dark')).forEach(function(el){
-        var r = el.getBoundingClientRect();
-        darkRanges.push([r.top + scrollY, r.bottom + scrollY]);
-      });
+    var isMobile = window.matchMedia('(max-width: 800px)').matches;
+    var N = isMobile ? 3000 : 6000;
+
+    var VERT = [
+      'attribute vec2 aAmbient;',
+      'attribute vec2 aShapeA;',
+      'attribute vec2 aShapeB;',
+      'attribute float aSeed;',
+      'attribute float aSize;',
+      'uniform float uTime;',
+      'uniform float uScrollY;',
+      'uniform float uDocH;',
+      'uniform float uViewportW;',
+      'uniform float uViewportH;',
+      'uniform float uModeA;',
+      'uniform float uModeB;',
+      'uniform vec2 uMouse;',
+      'uniform float uMouseStrength;',
+      'uniform float uDpr;',
+      'uniform vec2 uDarkZones[6];',
+      'uniform int uDarkZoneCount;',
+      'varying float vIsDark;',
+      'void main(){',
+      '  float speed = 0.004 + aSeed * 0.003;',
+      '  float yFrac = fract(aAmbient.y - uTime * speed);',
+      '  float sway = sin(uTime * 0.15 + aSeed * 6.2831) * 0.015;',
+      '  float xFrac = fract(aAmbient.x + sway);',
+      '  float worldY = yFrac * uDocH;',
+      '  float screenYpx = worldY - uScrollY;',
+      '  float screenXpx = xFrac * uViewportW;',
+      '  vIsDark = 0.0;',
+      '  for (int i = 0; i < 6; i++){',
+      '    if (i >= uDarkZoneCount) break;',
+      '    if (yFrac >= uDarkZones[i].x && yFrac <= uDarkZones[i].y) vIsDark = 1.0;',
+      '  }',
+      '  vec2 ambientNDC = vec2((screenXpx / uViewportW) * 2.0 - 1.0, 1.0 - (screenYpx / uViewportH) * 2.0);',
+      '  vec2 mouseNDC = vec2((uMouse.x / uViewportW) * 2.0 - 1.0, 1.0 - (uMouse.y / uViewportH) * 2.0);',
+      '  vec2 toP = ambientNDC - mouseNDC;',
+      '  float d = length(toP) + 0.0001;',
+      '  float falloff = clamp(1.0 - d / 0.25, 0.0, 1.0);',
+      '  vec2 repel = normalize(toP) * falloff * falloff * 0.12 * uMouseStrength * (1.0 - clamp(uModeA + uModeB, 0.0, 1.0));',
+      '  vec2 basePos = ambientNDC + repel;',
+      '  vec2 pos = mix(basePos, aShapeA, uModeA);',
+      '  pos = mix(pos, aShapeB, uModeB);',
+      '  gl_Position = vec4(pos, 0.0, 1.0);',
+      '  gl_PointSize = aSize * uDpr;',
+      '}'
+    ].join('\n');
+
+    var FRAG = [
+      'precision mediump float;',
+      'varying float vIsDark;',
+      'uniform vec3 uLightColor;',
+      'uniform vec3 uDarkColor;',
+      'void main(){',
+      '  vec2 c = gl_PointCoord - vec2(0.5);',
+      '  float d = length(c);',
+      '  float alpha = smoothstep(0.5, 0.1, d);',
+      '  vec3 color = mix(uLightColor, uDarkColor, vIsDark);',
+      '  gl_FragColor = vec4(color, alpha * 0.55);',
+      '}'
+    ].join('\n');
+
+    function compile(type, src){
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){ throw new Error(gl.getShaderInfoLog(s)); }
+      return s;
     }
-    function isDarkAt(worldY){
-      for(var i = 0; i < darkRanges.length; i++){
-        if(worldY >= darkRanges[i][0] && worldY <= darkRanges[i][1]) return true;
+    var prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(prog);
+    if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){ throw new Error(gl.getProgramInfoLog(prog)); }
+    gl.useProgram(prog);
+
+    function genVMark(n){
+      var pts = [];
+      var half = Math.floor(n / 2);
+      for(var i = 0; i < n; i++){
+        var onLeft = i < half;
+        var t = onLeft ? (i / half) : ((i - half) / (n - half));
+        var x, y;
+        if(onLeft){ x = -0.45 + t * 0.45; y = 0.45 - t * 0.9; }
+        else { x = 0 + t * 0.45; y = -0.45 + t * 0.9; }
+        var jitter = 0.018;
+        pts.push(x + (Math.random() - 0.5) * jitter, y + (Math.random() - 0.5) * jitter);
       }
-      return false;
+      return pts;
+    }
+    function genRing(n){
+      var pts = [];
+      for(var i = 0; i < n; i++){
+        var a = (i / n) * Math.PI * 2;
+        var r = 0.4 + (Math.random() - 0.5) * 0.03;
+        pts.push(Math.cos(a) * r, Math.sin(a) * r * 0.82);
+      }
+      return pts;
     }
 
-    function resize(){
+    var shapeA = genVMark(N);
+    var shapeB = genRing(N);
+    var ambient = new Float32Array(N * 2);
+    var seeds = new Float32Array(N);
+    var sizes = new Float32Array(N);
+    for(var i = 0; i < N; i++){
+      ambient[i*2] = Math.random();
+      ambient[i*2+1] = Math.random();
+      seeds[i] = Math.random();
+      sizes[i] = 1.2 + Math.random() * 2.2;
+    }
+
+    function makeBuf(data, itemSize, attrName){
+      var buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+      var loc = gl.getAttribLocation(prog, attrName);
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, itemSize, gl.FLOAT, false, 0, 0);
+      return buf;
+    }
+    makeBuf(ambient, 2, 'aAmbient');
+    makeBuf(shapeA, 2, 'aShapeA');
+    makeBuf(shapeB, 2, 'aShapeB');
+    makeBuf(seeds, 1, 'aSeed');
+    makeBuf(sizes, 1, 'aSize');
+
+    var u = {};
+    ['uTime','uScrollY','uDocH','uViewportW','uViewportH','uModeA','uModeB','uMouse','uMouseStrength','uDpr','uDarkZones','uDarkZoneCount','uLightColor','uDarkColor'].forEach(function(name){
+      u[name] = gl.getUniformLocation(prog, name);
+    });
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.clearColor(0, 0, 0, 0);
+
+    var dpr, vw, vh, docH, darkZones = [];
+    function measure(){
       vw = window.innerWidth; vh = window.innerHeight;
       docH = document.documentElement.scrollHeight;
       dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -846,65 +969,97 @@
       canvas.height = Math.round(vh * dpr);
       canvas.style.width = vw + 'px';
       canvas.style.height = vh + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      measureDarkSections();
+      gl.viewport(0, 0, canvas.width, canvas.height);
+
+      darkZones = [];
+      var scrollY = window.scrollY || window.pageYOffset;
+      Array.prototype.slice.call(document.querySelectorAll('.dark')).forEach(function(el){
+        var r = el.getBoundingClientRect();
+        darkZones.push([(r.top + scrollY) / docH, (r.bottom + scrollY) / docH]);
+      });
+    }
+    measure();
+
+    var heroEl = document.getElementById('heroSection');
+    var finalEl = document.querySelector('.final');
+    function zoneRange(el){
+      if(!el) return [-1e9, -1e9];
+      var r = el.getBoundingClientRect();
+      var scrollY = window.scrollY || window.pageYOffset;
+      return [r.top + scrollY, r.bottom + scrollY];
+    }
+    var heroZone = zoneRange(heroEl);
+    var finalZone = zoneRange(finalEl);
+
+    function bump(center, zoneTop, zoneBottom){
+      var zc = (zoneTop + zoneBottom) / 2;
+      var zh = Math.max(1, (zoneBottom - zoneTop) / 2);
+      var dist = Math.abs(center - zc);
+      return Math.max(0, 1 - dist / zh);
     }
 
-    function makeParticle(){
-      var y = Math.random() * docH;
-      return {
-        x: Math.random() * vw,
-        y: y,
-        vx: (Math.random() - 0.5) * 0.08,
-        vy: -0.05 - Math.random() * 0.12,
-        r: 0.6 + Math.random() * 1.4,
-        dark: isDarkAt(y)
-      };
+    var mouse = { x: -1000, y: -1000 };
+    var mouseStrength = 0;
+    if(window.matchMedia('(pointer: fine)').matches){
+      window.addEventListener('pointermove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; mouseStrength = 1; }, { passive:true });
+      window.addEventListener('pointerleave', function(){ mouseStrength = 0; });
     }
 
-    resize();
-    var isMobile = window.matchMedia('(max-width: 800px)').matches;
-    var COUNT = isMobile ? 60 : 120;
-    var particles = [];
-    for(var i = 0; i < COUNT; i++) particles.push(makeParticle());
-
+    var curModeA = 0, curModeB = 0;
     var running = true;
+    var startTime = performance.now();
+
     function frame(){
       if(!running) return;
       requestAnimationFrame(frame);
+      var time = (performance.now() - startTime) / 1000;
       var scrollY = window.scrollY || window.pageYOffset;
-      ctx.clearRect(0, 0, vw, vh);
-      for(var j = 0; j < particles.length; j++){
-        var p = particles[j];
-        p.x += p.vx; p.y += p.vy;
-        if(p.y < 0) p.y = docH;
-        if(p.y > docH) p.y = 0;
-        if(p.x < 0) p.x = vw;
-        if(p.x > vw) p.x = 0;
-        var screenY = p.y - scrollY;
-        if(screenY < -10 || screenY > vh + 10) continue;
-        ctx.beginPath();
-        ctx.arc(p.x, screenY, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.dark ? DARK_DOT : LIGHT_DOT;
-        ctx.fill();
-      }
+      var center = scrollY + vh / 2;
+
+      var targetA = bump(center, heroZone[0], heroZone[1]);
+      var targetB = bump(center, finalZone[0], finalZone[1]);
+      curModeA += (targetA - curModeA) * 0.06;
+      curModeB += (targetB - curModeB) * 0.06;
+
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform1f(u.uTime, time);
+      gl.uniform1f(u.uScrollY, scrollY);
+      gl.uniform1f(u.uDocH, docH);
+      gl.uniform1f(u.uViewportW, vw);
+      gl.uniform1f(u.uViewportH, vh);
+      gl.uniform1f(u.uModeA, curModeA);
+      gl.uniform1f(u.uModeB, curModeB);
+      gl.uniform2f(u.uMouse, mouse.x, mouse.y);
+      gl.uniform1f(u.uMouseStrength, mouseStrength);
+      gl.uniform1f(u.uDpr, dpr);
+      gl.uniform3f(u.uLightColor, 0.09, 0.09, 0.08);
+      gl.uniform3f(u.uDarkColor, 0.95, 0.94, 0.91);
+      var flat = [];
+      for(var i = 0; i < 6; i++) flat.push(darkZones[i] ? darkZones[i][0] : -1, darkZones[i] ? darkZones[i][1] : -1);
+      gl.uniform2fv(u.uDarkZones, flat);
+      gl.uniform1i(u.uDarkZoneCount, darkZones.length);
+
+      gl.drawArrays(gl.POINTS, 0, N);
     }
+    requestAnimationFrame(frame);
 
     var resizeTimer;
     window.addEventListener('resize', function(){
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function(){
-        resize();
-        particles.forEach(function(p){ p.dark = isDarkAt(p.y); });
+        measure();
+        heroZone = zoneRange(heroEl);
+        finalZone = zoneRange(finalEl);
       }, 200);
-    }, { passive: true });
+    }, { passive:true });
 
     document.addEventListener('visibilitychange', function(){
       running = !document.hidden;
       if(running) requestAnimationFrame(frame);
     });
 
-    requestAnimationFrame(frame);
+    canvas.addEventListener('webglcontextlost', function(e){ e.preventDefault(); running = false; });
+    canvas.addEventListener('webglcontextrestored', function(){ running = true; requestAnimationFrame(frame); });
   }catch(e){}
 })();
 

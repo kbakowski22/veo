@@ -810,21 +810,24 @@
   }catch(e){}
 })();
 
-/* particle stage: WebGL ambient field that assembles into the V-mark over the hero
-   and into a ring over the final countdown, in rhythm with scroll (inspired by
-   businessprogramme.ai's "Scena" effect, scaled down to two hand-built shapes) */
+/* particle stage: WebGL ambient field that assembles into a building silhouette over
+   the hero and into a ring over the final countdown, in rhythm with scroll (inspired
+   by businessprogramme.ai's "Scena" effect, scaled down to two hand-built shapes).
+   Desktop/tablet only — phones consistently struggled with this even at reduced
+   particle counts, so it's skipped entirely below the site's mobile breakpoint
+   rather than tuned further (same call made earlier for Lenis on this page). */
 (function(){
   try{
     var canvas = document.getElementById('particleStage');
     if(!canvas) return;
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ canvas.remove(); return; }
+    if(window.matchMedia('(max-width: 800px)').matches){ canvas.remove(); return; }
 
     var GL_OPTS = { alpha:true, premultipliedAlpha:true, antialias:false, depth:false, stencil:false, preserveDrawingBuffer:false, powerPreference:'high-performance' };
     var gl = canvas.getContext('webgl', GL_OPTS) || canvas.getContext('experimental-webgl', GL_OPTS);
     if(!gl){ canvas.remove(); return; }
 
-    var isMobile = window.matchMedia('(max-width: 800px)').matches;
-    var N = isMobile ? 9000 : 18000;
+    var N = 18000;
 
     var VERT = [
       'attribute vec2 aAmbient;',
@@ -901,18 +904,53 @@
     if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){ throw new Error(gl.getProgramInfoLog(prog)); }
     gl.useProgram(prog);
 
-    function genVMark(n){
-      /* matches the logo's V: narrower stance, sharp point, thin crisp stroke (not a scattered cloud) */
+    function genBuilding(n){
+      /* a simple gable-roofed building, wireframe edges dense + sparse face fill,
+         rotated 3/4 and projected to 2D on the CPU (same trick as businessprogramme.ai's
+         "Scena" shapes: bake a fixed 3D rotation into the point set, then drop depth) */
+      var rotY = 0.6, tiltX = 0.28;
+      var cy = Math.cos(rotY), sy = Math.sin(rotY);
+      var cx = Math.cos(tiltX), sx = Math.sin(tiltX);
+      function project(X, Y, Z){
+        var x1 = X * cy + Z * sy;
+        var z1 = -X * sy + Z * cy;
+        var y1 = Y * cx - z1 * sx;
+        return [x1 * 0.8, y1 * 0.8];
+      }
+      var W = 0.42, D = 0.30, Y0 = -0.42, Y1 = 0.26, ROOF = 0.54;
+      var edges = [
+        [[-W,Y0,-D],[W,Y0,-D]], [[W,Y0,-D],[W,Y0,D]], [[W,Y0,D],[-W,Y0,D]], [[-W,Y0,D],[-W,Y0,-D]],
+        [[-W,Y1,-D],[W,Y1,-D]], [[W,Y1,-D],[W,Y1,D]], [[W,Y1,D],[-W,Y1,D]], [[-W,Y1,D],[-W,Y1,-D]],
+        [[-W,Y0,-D],[-W,Y1,-D]], [[W,Y0,-D],[W,Y1,-D]], [[W,Y0,D],[W,Y1,D]], [[-W,Y0,D],[-W,Y1,D]],
+        [[-W,Y1,-D],[0,ROOF,0]], [[W,Y1,-D],[0,ROOF,0]], [[W,Y1,D],[0,ROOF,0]], [[-W,Y1,D],[0,ROOF,0]]
+      ];
+      var edgeCount = Math.floor(n * 0.8);
+      var perEdge = Math.floor(edgeCount / edges.length);
       var pts = [];
-      var half = Math.floor(n / 2);
-      for(var i = 0; i < n; i++){
-        var onLeft = i < half;
-        var t = onLeft ? (i / half) : ((i - half) / (n - half));
-        var x, y;
-        if(onLeft){ x = -0.30 + t * 0.30; y = 0.42 - t * 0.84; }
-        else { x = 0 + t * 0.30; y = -0.42 + t * 0.84; }
-        var jitter = 0.006;
-        pts.push(x + (Math.random() - 0.5) * jitter, y + (Math.random() - 0.5) * jitter);
+      var k = 0;
+      for(var e = 0; e < edges.length; e++){
+        var a = edges[e][0], b = edges[e][1];
+        var count = (e === edges.length - 1) ? (edgeCount - perEdge * (edges.length - 1)) : perEdge;
+        for(var q = 0; q < count; q++, k++){
+          var t = count > 1 ? q / (count - 1) : 0;
+          var X = a[0] + (b[0] - a[0]) * t, Y = a[1] + (b[1] - a[1]) * t, Z = a[2] + (b[2] - a[2]) * t;
+          var jitter = 0.006;
+          X += (Math.random() - 0.5) * jitter; Y += (Math.random() - 0.5) * jitter; Z += (Math.random() - 0.5) * jitter;
+          var xy = project(X, Y, Z);
+          pts.push(xy[0], xy[1]);
+        }
+      }
+      for(; k < n; k++){
+        var face = Math.floor(Math.random() * 3);
+        var X2, Y2, Z2;
+        if(face === 0){ X2 = (Math.random() * 2 - 1) * W; Y2 = Y0 + Math.random() * (Y1 - Y0); Z2 = D; }
+        else if(face === 1){ X2 = W; Y2 = Y0 + Math.random() * (Y1 - Y0); Z2 = (Math.random() * 2 - 1) * D; }
+        else {
+          var u = Math.random(), v = Math.random() * (1 - u), w = 1 - u - v;
+          X2 = -W * u + W * v + 0 * w; Y2 = Y1 * u + Y1 * v + ROOF * w; Z2 = D * u + D * v + 0 * w;
+        }
+        var xy2 = project(X2, Y2, Z2);
+        pts.push(xy2[0], xy2[1]);
       }
       return pts;
     }
@@ -936,10 +974,10 @@
       return buf;
     }
 
-    var HIGH_N = N, LOW_N = isMobile ? 4500 : 9000;
+    var HIGH_N = N, LOW_N = 9000, LOWER_N = 4500;
     function buildParticles(count){
       N = count;
-      var shapeA = genVMark(N);
+      var shapeA = genBuilding(N);
       var shapeB = genRing(N);
       var ambient = new Float32Array(N * 2);
       var seeds = new Float32Array(N);
@@ -1016,7 +1054,9 @@
     var curModeA = 0, curModeB = 0;
     var running = true;
     var startTime = performance.now();
-    var frameCount = 0, qualityCheckAt = 90; /* ~1.5s in, before any visitor forms an impression */
+    var frameCount = 0, framesAtStage = 0, timeAtStage = 0;
+    var qualityStage = 0; /* 0: not checked, 1: checked once (maybe dropped to LOW_N), 2: checked twice */
+    var CHECK1_AT = 90, CHECK2_AT = 180; /* ~1.5s, then ~3s after that */
 
     function frame(){
       if(!running) return;
@@ -1027,10 +1067,14 @@
       var center = scrollY + vh / 2;
 
       frameCount++;
-      if(!qualityChecked && frameCount >= qualityCheckAt){
-        qualityChecked = true;
-        var fps = frameCount / time;
-        if(fps < 45 && N !== LOW_N) buildParticles(LOW_N);
+      if(qualityStage === 0 && frameCount >= CHECK1_AT){
+        var fps1 = frameCount / time;
+        if(fps1 < 45) buildParticles(LOW_N);
+        qualityStage = 1; framesAtStage = frameCount; timeAtStage = time;
+      } else if(qualityStage === 1 && (frameCount - framesAtStage) >= CHECK2_AT){
+        var fps2 = (frameCount - framesAtStage) / (time - timeAtStage);
+        if(fps2 < 45) buildParticles(LOWER_N);
+        qualityStage = 2;
       }
 
       var targetA = bump(center, heroZone[0], heroZone[1]);

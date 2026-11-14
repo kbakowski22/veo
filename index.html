@@ -819,12 +819,12 @@
     if(!canvas) return;
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    var GL_OPTS = { alpha:true, premultipliedAlpha:false, antialias:false, depth:false, stencil:false, preserveDrawingBuffer:false, powerPreference:'high-performance' };
+    var GL_OPTS = { alpha:true, premultipliedAlpha:true, antialias:false, depth:false, stencil:false, preserveDrawingBuffer:false, powerPreference:'high-performance' };
     var gl = canvas.getContext('webgl', GL_OPTS) || canvas.getContext('experimental-webgl', GL_OPTS);
     if(!gl){ canvas.remove(); return; }
 
     var isMobile = window.matchMedia('(max-width: 800px)').matches;
-    var N = isMobile ? 3000 : 6000;
+    var N = isMobile ? 9000 : 18000;
 
     var VERT = [
       'attribute vec2 aAmbient;',
@@ -846,9 +846,10 @@
       'uniform int uDarkZoneCount;',
       'varying float vIsDark;',
       'void main(){',
-      '  float speed = 0.004 + aSeed * 0.003;',
+      '  float speedPx = 45.0 + aSeed * 90.0;',
+      '  float speed = speedPx / uDocH;',
       '  float yFrac = fract(aAmbient.y - uTime * speed);',
-      '  float sway = sin(uTime * 0.15 + aSeed * 6.2831) * 0.015;',
+      '  float sway = sin(uTime * 0.12 + aSeed * 6.2831) * 0.02;',
       '  float xFrac = fract(aAmbient.x + sway);',
       '  float worldY = yFrac * uDocH;',
       '  float screenYpx = worldY - uScrollY;',
@@ -880,9 +881,9 @@
       'void main(){',
       '  vec2 c = gl_PointCoord - vec2(0.5);',
       '  float d = length(c);',
-      '  float alpha = smoothstep(0.5, 0.1, d);',
+      '  float alpha = smoothstep(0.5, 0.1, d) * 0.45;',
       '  vec3 color = mix(uLightColor, uDarkColor, vIsDark);',
-      '  gl_FragColor = vec4(color, alpha * 0.55);',
+      '  gl_FragColor = vec4(color * alpha, alpha);',
       '}'
     ].join('\n');
 
@@ -901,15 +902,16 @@
     gl.useProgram(prog);
 
     function genVMark(n){
+      /* matches the logo's V: narrower stance, sharp point, thin crisp stroke (not a scattered cloud) */
       var pts = [];
       var half = Math.floor(n / 2);
       for(var i = 0; i < n; i++){
         var onLeft = i < half;
         var t = onLeft ? (i / half) : ((i - half) / (n - half));
         var x, y;
-        if(onLeft){ x = -0.45 + t * 0.45; y = 0.45 - t * 0.9; }
-        else { x = 0 + t * 0.45; y = -0.45 + t * 0.9; }
-        var jitter = 0.018;
+        if(onLeft){ x = -0.30 + t * 0.30; y = 0.42 - t * 0.84; }
+        else { x = 0 + t * 0.30; y = -0.42 + t * 0.84; }
+        var jitter = 0.006;
         pts.push(x + (Math.random() - 0.5) * jitter, y + (Math.random() - 0.5) * jitter);
       }
       return pts;
@@ -924,18 +926,6 @@
       return pts;
     }
 
-    var shapeA = genVMark(N);
-    var shapeB = genRing(N);
-    var ambient = new Float32Array(N * 2);
-    var seeds = new Float32Array(N);
-    var sizes = new Float32Array(N);
-    for(var i = 0; i < N; i++){
-      ambient[i*2] = Math.random();
-      ambient[i*2+1] = Math.random();
-      seeds[i] = Math.random();
-      sizes[i] = 1.2 + Math.random() * 2.2;
-    }
-
     function makeBuf(data, itemSize, attrName){
       var buf = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -945,11 +935,29 @@
       gl.vertexAttribPointer(loc, itemSize, gl.FLOAT, false, 0, 0);
       return buf;
     }
-    makeBuf(ambient, 2, 'aAmbient');
-    makeBuf(shapeA, 2, 'aShapeA');
-    makeBuf(shapeB, 2, 'aShapeB');
-    makeBuf(seeds, 1, 'aSeed');
-    makeBuf(sizes, 1, 'aSize');
+
+    var HIGH_N = N, LOW_N = isMobile ? 4500 : 9000;
+    function buildParticles(count){
+      N = count;
+      var shapeA = genVMark(N);
+      var shapeB = genRing(N);
+      var ambient = new Float32Array(N * 2);
+      var seeds = new Float32Array(N);
+      var sizes = new Float32Array(N);
+      for(var i = 0; i < N; i++){
+        ambient[i*2] = Math.random();
+        ambient[i*2+1] = Math.random();
+        seeds[i] = Math.random();
+        sizes[i] = 1.0 + Math.random() * 1.6;
+      }
+      makeBuf(ambient, 2, 'aAmbient');
+      makeBuf(shapeA, 2, 'aShapeA');
+      makeBuf(shapeB, 2, 'aShapeB');
+      makeBuf(seeds, 1, 'aSeed');
+      makeBuf(sizes, 1, 'aSize');
+    }
+    buildParticles(HIGH_N);
+    var qualityChecked = false;
 
     var u = {};
     ['uTime','uScrollY','uDocH','uViewportW','uViewportH','uModeA','uModeB','uMouse','uMouseStrength','uDpr','uDarkZones','uDarkZoneCount','uLightColor','uDarkColor'].forEach(function(name){
@@ -957,7 +965,7 @@
     });
 
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.clearColor(0, 0, 0, 0);
 
     var dpr, vw, vh, docH, darkZones = [];
@@ -1008,13 +1016,22 @@
     var curModeA = 0, curModeB = 0;
     var running = true;
     var startTime = performance.now();
+    var frameCount = 0, qualityCheckAt = 90; /* ~1.5s in, before any visitor forms an impression */
 
     function frame(){
       if(!running) return;
       requestAnimationFrame(frame);
-      var time = (performance.now() - startTime) / 1000;
+      var now = performance.now();
+      var time = (now - startTime) / 1000;
       var scrollY = window.scrollY || window.pageYOffset;
       var center = scrollY + vh / 2;
+
+      frameCount++;
+      if(!qualityChecked && frameCount >= qualityCheckAt){
+        qualityChecked = true;
+        var fps = frameCount / time;
+        if(fps < 45 && N !== LOW_N) buildParticles(LOW_N);
+      }
 
       var targetA = bump(center, heroZone[0], heroZone[1]);
       var targetB = bump(center, finalZone[0], finalZone[1]);

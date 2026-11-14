@@ -287,6 +287,9 @@
   .dark .feature p{ color:var(--dark-muted); }
 
   /* ---------- status stats ---------- */
+  .status-deco{ margin-top:40px; display:flex; justify-content:flex-end; }
+  .status-deco svg{ width:140px; height:140px; }
+  @media (max-width:800px){ .status-deco{ display:none; } }
   .status-grid{ display:grid; grid-template-columns:1fr 1fr; gap:70px; align-items:end; }
   .status-copy p{ font-size:19px; max-width:520px; color:#d0cbc2; margin-top:20px; }
   .stat-row{ display:flex; gap:60px; flex-wrap:wrap; }
@@ -629,6 +632,14 @@
           <div class="stat"><b data-count="2026">0</b><span>zakup działki</span></div>
           <div class="stat"><b data-count="1" data-pad="2">00</b><span>inwestycja w przygotowaniu</span></div>
           <div class="stat"><b data-count="2027">0</b><span>start budowy</span></div>
+        </div>
+        <div class="status-deco" aria-hidden="true">
+          <svg viewBox="0 0 220 220">
+            <polygon points="42,168 176,182 188,58 56,38" fill="none" stroke="var(--dark-muted)" stroke-width="1" stroke-dasharray="5 4" opacity="0.5"/>
+            <line x1="56" y1="38" x2="44" y2="18" stroke="var(--dark-muted)" stroke-width="1" opacity="0.4"/>
+            <line x1="188" y1="58" x2="208" y2="46" stroke="var(--dark-muted)" stroke-width="1" opacity="0.4"/>
+            <circle cx="56" cy="38" r="4" fill="var(--accent-gold)"/>
+          </svg>
         </div>
       </div>
     </div>

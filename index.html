@@ -920,21 +920,25 @@
 })();
 
 /* particle stage: WebGL ambient field — subtle dots drifting across the whole page
-   (businessprogramme.ai-style ambience, without their shape-morphing). Desktop/tablet
-   only — phones consistently struggled with this even scaled down, so it's skipped
-   entirely below the site's mobile breakpoint (same call made for Lenis earlier). */
+   (businessprogramme.ai-style ambience, without their shape-morphing). Now runs on mobile
+   too, but far lighter (a fraction of the particles, capped device pixel ratio) and,
+   critically, rendering is fully paused for the duration of any active scroll gesture —
+   the canvas just holds its last frame — so it never competes with scroll compositing.
+   The adaptive desktop quality-downgrade tiers are skipped on mobile since it already
+   starts at a conservative fixed count. */
 (function(){
   try{
     var canvas = document.getElementById('particleStage');
     if(!canvas) return;
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ canvas.remove(); return; }
-    if(window.matchMedia('(max-width: 800px)').matches){ canvas.remove(); return; }
 
-    var GL_OPTS = { alpha:true, premultipliedAlpha:true, antialias:false, depth:false, stencil:false, preserveDrawingBuffer:false, powerPreference:'high-performance' };
+    var isMobile = window.matchMedia('(max-width: 800px)').matches;
+
+    var GL_OPTS = { alpha:true, premultipliedAlpha:true, antialias:false, depth:false, stencil:false, preserveDrawingBuffer:false, powerPreference: isMobile ? 'low-power' : 'high-performance' };
     var gl = canvas.getContext('webgl', GL_OPTS) || canvas.getContext('experimental-webgl', GL_OPTS);
     if(!gl){ canvas.remove(); return; }
 
-    var N = 18000;
+    var N = isMobile ? 1000 : 18000;
 
     var VERT = [
       'attribute vec2 aAmbient;',
@@ -1007,7 +1011,7 @@
       return buf;
     }
 
-    var HIGH_N = N, LOW_N = 9000, LOWER_N = 4500;
+    var HIGH_N = N, LOW_N = isMobile ? 600 : 9000, LOWER_N = isMobile ? 350 : 4500;
     function buildParticles(count){
       N = count;
       var ambient = new Float32Array(N * 2);
@@ -1038,7 +1042,7 @@
     function measure(){
       vw = window.innerWidth; vh = window.innerHeight;
       docH = document.documentElement.scrollHeight;
-      dpr = Math.min(2, window.devicePixelRatio || 1);
+      dpr = isMobile ? 1 : Math.min(2, window.devicePixelRatio || 1);
       canvas.width = Math.round(vw * dpr);
       canvas.height = Math.round(vh * dpr);
       canvas.style.width = vw + 'px';
@@ -1060,22 +1064,34 @@
     var qualityStage = 0; /* 0: not checked, 1: checked once (maybe dropped to LOW_N), 2: checked twice */
     var CHECK1_AT = 90, CHECK2_AT = 180; /* ~1.5s, then ~3s after that */
 
+    var scrolling = false, scrollEndTimer = null;
+    if(isMobile){
+      window.addEventListener('scroll', function(){
+        scrolling = true;
+        clearTimeout(scrollEndTimer);
+        scrollEndTimer = setTimeout(function(){ scrolling = false; }, 140);
+      }, { passive:true });
+    }
+
     function frame(){
       if(!running) return;
       requestAnimationFrame(frame);
+      if(isMobile && scrolling) return; /* do zero work while the page is actively scrolling */
       var now = performance.now();
       var time = (now - startTime) / 1000;
       var scrollY = window.scrollY || window.pageYOffset;
 
       frameCount++;
-      if(qualityStage === 0 && frameCount >= CHECK1_AT){
-        var fps1 = frameCount / time;
-        if(fps1 < 45) buildParticles(LOW_N);
-        qualityStage = 1; framesAtStage = frameCount; timeAtStage = time;
-      } else if(qualityStage === 1 && (frameCount - framesAtStage) >= CHECK2_AT){
-        var fps2 = (frameCount - framesAtStage) / (time - timeAtStage);
-        if(fps2 < 45) buildParticles(LOWER_N);
-        qualityStage = 2;
+      if(!isMobile){
+        if(qualityStage === 0 && frameCount >= CHECK1_AT){
+          var fps1 = frameCount / time;
+          if(fps1 < 45) buildParticles(LOW_N);
+          qualityStage = 1; framesAtStage = frameCount; timeAtStage = time;
+        } else if(qualityStage === 1 && (frameCount - framesAtStage) >= CHECK2_AT){
+          var fps2 = (frameCount - framesAtStage) / (time - timeAtStage);
+          if(fps2 < 45) buildParticles(LOWER_N);
+          qualityStage = 2;
+        }
       }
 
       gl.clear(gl.COLOR_BUFFER_BIT);

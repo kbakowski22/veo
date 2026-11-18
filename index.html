@@ -299,9 +299,6 @@
   .dark .feature p{ color:var(--dark-muted); }
 
   /* ---------- status stats ---------- */
-  .status-progress{ margin-top:40px; display:flex; justify-content:flex-end; }
-  .status-progress svg{ width:130px; height:130px; }
-  @media (max-width:800px){ .status-progress{ display:none; } }
   .status-grid{ display:grid; grid-template-columns:1fr 1fr; gap:70px; align-items:end; }
   .status-copy p{ font-size:19px; max-width:520px; color:#d0cbc2; margin-top:20px; }
   .stat-row{ display:flex; gap:60px; flex-wrap:wrap; }
@@ -674,12 +671,6 @@
           <div class="stat"><b data-count="2026">0</b><span>zakup działki</span></div>
           <div class="stat"><b data-count="1" data-pad="2">00</b><span>inwestycja w przygotowaniu</span></div>
           <div class="stat"><b data-count="2027">0</b><span>start budowy</span></div>
-        </div>
-        <div class="status-progress" aria-hidden="true">
-          <svg viewBox="0 0 160 160">
-            <circle class="status-stamp-circle" cx="80" cy="80" r="68" fill="none" stroke="var(--dark-muted)" stroke-width="1.5"/>
-            <path class="status-stamp-check" d="M52,82 L72,100 L110,58" fill="none" stroke="var(--accent-gold)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
         </div>
       </div>
     </div>
@@ -1181,21 +1172,6 @@
           scrollTrigger:{ trigger:line, start:'top 92%', end:'top 55%', scrub:0.6 }
         });
       });
-    }
-
-    /* status: "zabezpieczone" stamp draws in */
-    var stampCircle = document.querySelector('.status-stamp-circle');
-    var stampCheck = document.querySelector('.status-stamp-check');
-    if(stampCircle && stampCheck){
-      try{
-        var circleLen = stampCircle.getTotalLength();
-        var checkLen = stampCheck.getTotalLength();
-        gsap.set(stampCircle, { strokeDasharray: circleLen, strokeDashoffset: circleLen });
-        gsap.set(stampCheck, { strokeDasharray: checkLen, strokeDashoffset: checkLen });
-        gsap.timeline({ scrollTrigger:{ trigger:'.status-progress', start:'top 85%' } })
-          .to(stampCircle, { strokeDashoffset:0, duration:0.8, ease:'power2.out' })
-          .to(stampCheck, { strokeDashoffset:0, duration:0.5, ease:'power2.out' }, '-=0.15');
-      }catch(e){}
     }
 
     /* scroll-scrubbed headline word reveal, inspired by bulbree.com (desktop only, same

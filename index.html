@@ -1134,16 +1134,18 @@ html.menu-blokada { overflow: hidden; }
   var ACC = hex(cs.getPropertyValue("--akcent") || "#141413"), ACC2 = hex(cs.getPropertyValue("--akcent-jasny") || "#141413");
 
   /* --- layout --- */
-  var vw = 0, vh = 0, cw = 0, ch = 0, dpr = 1, docH = 0, anchors = [];
+  var vw = 0, vh = 0, cw = 0, ch = 0, dpr = 1, docH = 0, anchors = [], canvasTop = -1;
   /* canvas size changes only on a real resize: a phone's address bar showing or hiding
      changes the height a little, and re-allocating the canvas then would flash it */
   function rozmiar() {
     var w = window.innerWidth, h = window.innerHeight;
     if (phone && w === vw && Math.abs(h - vh) < vh * 0.25) return;
     vw = w; vh = h;
-    dpr = phone ? Math.min(zywy ? 1.25 : 1.5, window.devicePixelRatio || 1) : Math.min(2, window.devicePixelRatio || 1);
-    /* live on a phone: fixed canvas a little taller than the screen, so a hiding address bar never uncovers its edge */
-    cw = vw; ch = phone ? Math.round(vh * (zywy ? 1.15 : 1.4)) : vh;
+    dpr = phone ? Math.min(1.25, window.devicePixelRatio || 1) : Math.min(2, window.devicePixelRatio || 1);
+    /* phones: the canvas belongs to the page (twice the screen tall) and scrolls with it on the compositor,
+       so shapes drawn in page coordinates stay glued to the text even when a redraw lands a frame late */
+    cw = vw; ch = phone ? Math.round(vh * 2) : vh;
+    canvasTop = -1;
     canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
     canvas.style.width = cw + "px"; canvas.style.height = ch + "px";
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -1157,7 +1159,7 @@ html.menu-blokada { overflow: hidden; }
       .sort(function (a, b) { return a.top - b.top; });
   }
   function measure() { rozmiar(); uklad(); }
-  if (phone && !zywy) canvas.classList.add("na-stronie");
+  if (phone) canvas.classList.add("na-stronie");
 
   function target(sy) {
     var n = anchors.length; if (!n) return 0;
@@ -1192,7 +1194,7 @@ html.menu-blokada { overflow: hidden; }
   }
   function obniz() {
     if (poziom === 1) drawN = 2600;
-    else { zywy = false; drawN = N; dobre = 3; canvas.classList.add("na-stronie"); vw = 0; rozmiar(); }
+    else { zywy = false; drawN = N; dobre = 3; }
   }
   var scrolling = false, scrollTimer = 0, needDraw = true, visible = true;
   if (phone) {
@@ -1220,10 +1222,14 @@ html.menu-blokada { overflow: hidden; }
     var A = anchors[i], B = anchors[Math.min(n - 1, i + 1)];
     bind(A.s, B.s);
     var offY = 0;
-    if (phone && !zywy) {
-      var top = Math.max(0, Math.min(docH - ch, sy - vh * 0.2));
-      canvas.style.transform = "translate3d(0," + top + "px,0)";
-      offY = top - sy;
+    if (phone) {
+      /* move the canvas only when the screen nears its edge; between moves it rides along with the page */
+      var maxTop = Math.max(0, docH - ch);
+      if (canvasTop < 0 || canvasTop > maxTop || sy < canvasTop + vh * 0.15 || sy + vh > canvasTop + ch - vh * 0.15) {
+        canvasTop = Math.max(0, Math.min(maxTop, Math.round(sy - (ch - vh) / 2)));
+        canvas.style.transform = "translate3d(0," + canvasTop + "px,0)";
+      }
+      offY = canvasTop - sy;
     }
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform4fv(U.uRotA, params(A, time)); gl.uniform4fv(U.uRotB, params(B, time));
@@ -1341,7 +1347,8 @@ html.menu-blokada { overflow: hidden; }
   function zbuduj() {
     var gory = sekcje.map(function (s) { return s.getBoundingClientRect().top + window.scrollY; });
     var calosc = Math.max(1, html.scrollHeight - window.innerHeight);
-    zakres = Math.max(1, Math.min(calosc, gory[gory.length - 1] - window.innerHeight * 0.45));
+    /* phones: 100 % means the very bottom of the page, so the bar never runs ahead of the reader */
+    zakres = mqPhone.matches ? calosc : Math.max(1, Math.min(calosc, gory[gory.length - 1] - window.innerHeight * 0.45));
     lista.innerHTML = "";
     etapy = sekcje.map(function (s, i) {
       var udzial = i === 0 ? 0 : Math.min(1, Math.max(0, (gory[i] - window.innerHeight * 0.45) / zakres));
@@ -1374,6 +1381,7 @@ html.menu-blokada { overflow: hidden; }
   window.addEventListener("resize", przelicz);
   window.addEventListener("load", przelicz);
   przelicz();
+  if (mqPhone.matches && window.ResizeObserver) { var tP = 0; new ResizeObserver(function () { clearTimeout(tP); tP = setTimeout(przelicz, 200); }).observe(document.body); }
 
   if (touch || mqPhone.matches) {
     var tRuch = 0;

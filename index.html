@@ -385,7 +385,8 @@ html.menu-blokada { overflow: hidden; }
 .lokalizacja__tekst .tekst--duzy { margin-top: 24px; max-width: 40ch; }
 .lokalizacja__tekst .cta { margin-top: 40px; }
 .lokalizacja__kotwica { aspect-ratio: 1; width: min(100%, 560px); justify-self: end; pointer-events: none; }
-.plakat { padding-block: var(--sekcja) calc(var(--sekcja) * 1.4); }
+.plakat { padding-block: var(--sekcja) calc(var(--sekcja) * 0.25); }
+@media (min-width: 769px) { .co-budujemy { padding-top: calc(var(--sekcja) * 0.75); } }
 .plakat__linia { display: block; font-size: clamp(46px, 9vw, 140px); font-weight: 500; line-height: 0.9; letter-spacing: -0.028em; }
 .plakat__linia.akcent { color: var(--tekst-2); }
 .plakat__linia:nth-child(2) { padding-left: 8%; }

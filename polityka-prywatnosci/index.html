@@ -62,7 +62,7 @@ h1 span { display: block; font-weight: 300; letter-spacing: -0.045em; color: var
 .tytul__data { margin-top: 26px; font-size: 13px; color: var(--tekst-2); }
 
 /* summary */
-.skrot { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; padding: clamp(22px, 2.4vw, 32px); background: color-mix(in srgb, var(--biel) 64%, transparent); border: 1px solid color-mix(in srgb, var(--tekst) 8%, transparent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 16px 40px -24px rgba(0, 0, 0, 0.22); }
+.skrot { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: clamp(22px, 2.4vw, 32px); background: color-mix(in srgb, var(--biel) 64%, transparent); border: 1px solid color-mix(in srgb, var(--tekst) 8%, transparent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 16px 40px -24px rgba(0, 0, 0, 0.22); }
 .skrot div { min-width: 0; }
 .skrot b { display: block; font-size: 17px; font-weight: 500; letter-spacing: -0.015em; line-height: 1.3; }
 .skrot p { margin-top: 8px; font-size: 14px; line-height: 1.5; color: var(--tekst-opis); }
@@ -115,7 +115,6 @@ h1 span { display: block; font-weight: 300; letter-spacing: -0.045em; color: var
 
 @media (max-width: 1024px) {
   :root { --margines: 32px; }
-  .skrot { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 768px) {
   :root { --margines: 20px; }
@@ -151,7 +150,6 @@ h1 span { display: block; font-weight: 300; letter-spacing: -0.045em; color: var
     <div class="skrot">
       <div><b>Nie śledzimy Cię</b><p>Strona nie używa plików cookies, analityki ani pikseli reklamowych.</p></div>
       <div><b>Tylko to, co nam wyślesz</b><p>Przetwarzamy dane z wiadomości, które do nas piszesz, i podstawowe logi serwera.</p></div>
-      <div><b>Nie sprzedajemy danych</b><p>Przekazujemy je tylko firmom, bez których strona i poczta by nie działały.</p></div>
       <div><b>Masz pełną kontrolę</b><p>Napisz na kontakt@veodevelopment.pl, a odpowiemy w ciągu kilku dni.</p></div>
     </div>
   </section>

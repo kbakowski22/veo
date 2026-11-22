@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polityka prywatności · Veo Development</title>
+<meta name="description" content="Jakie dane osobowe przetwarza Veo Development, w jakim celu i jakie prawa Ci przysługują.">
+<meta name="theme-color" content="#F3F3F1">
+<link rel="canonical" href="https://www.veodevelopment.pl/polityka-prywatnosci/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/inter-tight-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Inter Tight (SIL OFL 1.1, /assets/fonts/OFL.txt), served from this site */
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(/assets/fonts/inter-tight-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Inter Tight"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(/assets/fonts/inter-tight-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+/* same system as the home page: one typeface, ink on a warm light ground, 1340px grid */
+:root {
+  --tlo: #F3F3F1;
+  --biel: #FFFFFF;
+  --tekst: #0D0D0C;
+  --tekst-2: #7A7873;
+  --tekst-opis: #4F4D49;
+  --linia: #DCDBD6;
+  --powierzchnia: #EBEBE7;
+  --kroj: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --krzywa: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --kontener: 1340px;
+  --margines: 50px;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; background: var(--tlo); scroll-behavior: smooth; scroll-padding-top: 100px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--tlo); color: var(--tekst); font-family: var(--kroj); font-size: 16px; font-weight: 300; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: clip; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 2px solid var(--tekst); outline-offset: 3px; }
+::selection { background: var(--tekst); color: var(--biel); }
+.kontener { width: min(100% - 2 * var(--margines), var(--kontener)); margin-inline: auto; }
+
+/* header */
+.naglowek { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--tlo) 88%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--linia); }
+.naglowek .kontener { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 76px; }
+.naglowek img { height: 34px; width: auto; }
+.wroc { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; text-decoration: none; padding: 10px 0; }
+.wroc svg { width: 14px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.5; transition: transform 0.35s var(--krzywa); }
+.wroc:hover svg { transform: translateX(-3px); }
+
+/* title */
+.tytul { padding: clamp(48px, 7vw, 110px) 0 clamp(36px, 4vw, 56px); }
+.etykieta { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--tekst-2); }
+.etykieta svg { width: 14px; height: 12px; fill: currentColor; }
+h1 { margin-top: 20px; font-size: clamp(48px, 7.6vw, 116px); font-weight: 500; line-height: 1; letter-spacing: -0.04em; }
+h1 span { display: block; font-weight: 300; letter-spacing: -0.045em; color: var(--tekst-2); }
+.tytul__opis { margin-top: 28px; max-width: 44ch; font-size: clamp(18px, 1.5vw, 21px); line-height: 1.45; color: var(--tekst-opis); }
+.tytul__data { margin-top: 18px; font-size: 13px; color: var(--tekst-2); }
+
+/* summary */
+.skrot { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; padding: clamp(22px, 2.4vw, 32px); background: color-mix(in srgb, var(--biel) 64%, transparent); border: 1px solid color-mix(in srgb, var(--tekst) 8%, transparent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 16px 40px -24px rgba(0, 0, 0, 0.22); }
+.skrot div { min-width: 0; }
+.skrot b { display: block; font-size: 17px; font-weight: 500; letter-spacing: -0.015em; line-height: 1.3; }
+.skrot p { margin-top: 8px; font-size: 14px; line-height: 1.5; color: var(--tekst-opis); }
+
+/* body: sticky contents on the left, text on the right */
+.tresc { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 20px; padding: clamp(56px, 7vw, 110px) 0 clamp(72px, 8vw, 128px); }
+.spis { position: sticky; top: 110px; align-self: start; }
+.spis p { font-size: 13px; color: var(--tekst-2); margin-bottom: 14px; }
+.spis ol { counter-reset: s; border-left: 1px solid var(--linia); }
+.spis a { display: flex; gap: 12px; padding: 7px 0 7px 16px; margin-left: -1px; border-left: 1px solid transparent; font-size: 14px; text-decoration: none; color: var(--tekst-opis); transition: color 0.3s, border-color 0.3s; }
+.spis a span { min-width: 20px; font-size: 12px; color: var(--tekst-2); font-variant-numeric: tabular-nums; padding-top: 1px; }
+.spis a:hover, .spis a.aktywny { color: var(--tekst); border-left-color: var(--tekst); }
+
+.rozdzial { padding: 34px 0 38px; border-top: 1px solid var(--linia); }
+.rozdzial:first-child { border-top: 0; padding-top: 0; }
+.rozdzial__nr { display: block; font-size: 12px; font-weight: 500; color: var(--tekst-2); font-variant-numeric: tabular-nums; }
+.rozdzial h2 { margin-top: 10px; font-size: clamp(26px, 2.4vw, 34px); font-weight: 500; line-height: 1.1; letter-spacing: -0.03em; }
+.rozdzial h3 { margin-top: 26px; font-size: 18px; font-weight: 500; letter-spacing: -0.015em; }
+.rozdzial p, .rozdzial li { font-size: 16px; color: var(--tekst-opis); max-width: 68ch; }
+.rozdzial p { margin-top: 14px; }
+.rozdzial ul { margin-top: 12px; display: grid; gap: 8px; }
+.rozdzial li { position: relative; padding-left: 20px; }
+.rozdzial li::before { content: ""; position: absolute; left: 2px; top: 0.72em; width: 8px; height: 1px; background: var(--tekst); }
+.rozdzial strong { font-weight: 500; color: var(--tekst); }
+.rozdzial a { text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.dane { margin-top: 18px; display: grid; grid-template-columns: auto 1fr; border-top: 1px solid var(--linia); max-width: 640px; }
+.dane dt, .dane dd { margin: 0; padding: 11px 0; border-bottom: 1px solid var(--linia); font-size: 15px; }
+.dane dt { color: var(--tekst-2); padding-right: 20px; }
+.dane dd { font-weight: 500; }
+.cel { margin-top: 18px; padding: 20px 22px; background: color-mix(in srgb, var(--biel) 55%, transparent); border: 1px solid var(--linia); }
+.cel h3 { margin-top: 0; }
+.cel dl { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 0 16px; margin: 14px 0 0; }
+.cel dt, .cel dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--linia); font-size: 14.5px; line-height: 1.5; }
+.cel dt { color: var(--tekst-2); }
+.cel dd { color: var(--tekst-opis); }
+
+/* footer, as on the home page */
+.stopka { border-top: 1px solid var(--linia); padding: 32px 0 44px; font-size: 13px; color: var(--tekst-2); }
+.stopka__firma { max-width: 110ch; font-size: 12px; line-height: 1.6; }
+.stopka__dol { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-top: 18px; }
+.stopka__dol nav { display: flex; gap: 10px 24px; flex-wrap: wrap; }
+.stopka a { text-decoration: none; color: var(--tekst); transition: color 0.3s; }
+.stopka a:hover { color: var(--tekst-2); }
+
+/* gentle entrance */
+@media (prefers-reduced-motion: no-preference) {
+  .wejscie { animation: wejscie 0.9s var(--krzywa) both; animation-delay: var(--o, 0s); }
+  @keyframes wejscie { from { opacity: 0; transform: translateY(16px); } }
+}
+
+@media (max-width: 1024px) {
+  :root { --margines: 32px; }
+  .skrot { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  :root { --margines: 20px; }
+  .naglowek .kontener { min-height: 64px; }
+  .naglowek img { height: 28px; }
+  .skrot { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .tresc { grid-template-columns: minmax(0, 1fr); padding-top: 48px; }
+  .spis { position: static; margin-bottom: 20px; }
+  .cel { padding: 18px 16px; }
+  .cel dl { grid-template-columns: minmax(0, 1fr); }
+  .cel dt { padding-bottom: 0; }
+  .cel dd { border-top: 0; padding-top: 2px; }
+}
+</style>
+</head>
+<body>
+
+<header class="naglowek">
+  <div class="kontener">
+    <a href="/" aria-label="Veo Development, strona główna"><img src="/assets/logo-full-transparent.png" alt="Veo Development" width="752" height="340"></a>
+    <a class="wroc" href="/"><svg viewBox="0 0 14 10" aria-hidden="true"><path d="M13 5 H1.5 M5 1 L1 5 L5 9"/></svg>Strona główna</a>
+  </div>
+</header>
+
+<main>
+  <section class="kontener tytul">
+    <p class="etykieta wejscie"><svg viewBox="0 0 14 12"><rect width="14" height="1.6"/><rect x="1.5" y="5.2" width="11" height="1.6"/><rect y="10.4" width="14" height="1.6"/></svg>Dokumenty</p>
+    <h1 class="wejscie" style="--o:.08s">Polityka <span>prywatności.</span></h1>
+    <p class="tytul__opis wejscie" style="--o:.16s">Krótko i po ludzku: jakie dane osobowe przetwarzamy, po co, jak długo i jakie masz prawa.</p>
+    <p class="tytul__data wejscie" style="--o:.22s">Obowiązuje od 22 listopada 2026 r.</p>
+  </section>
+
+  <section class="kontener wejscie" style="--o:.3s" aria-label="W skrócie">
+    <div class="skrot">
+      <div><b>Nie śledzimy Cię</b><p>Strona nie używa plików cookies, analityki ani pikseli reklamowych.</p></div>
+      <div><b>Tylko to, co nam wyślesz</b><p>Przetwarzamy dane z wiadomości, które do nas piszesz, i podstawowe logi serwera.</p></div>
+      <div><b>Nie sprzedajemy danych</b><p>Przekazujemy je tylko firmom, bez których strona i poczta by nie działały.</p></div>
+      <div><b>Masz pełną kontrolę</b><p>Napisz na kontakt@veodevelopment.pl, a odpowiemy w ciągu kilku dni.</p></div>
+    </div>
+  </section>
+
+  <div class="kontener tresc">
+    <nav class="spis" aria-label="Spis treści">
+      <p>Spis treści</p>
+      <ol>
+        <li><a href="#administrator"><span>01</span>Kto jest administratorem</a></li>
+        <li><a href="#cele"><span>02</span>Jakie dane i po co</a></li>
+        <li><a href="#odbiorcy"><span>03</span>Komu przekazujemy dane</a></li>
+        <li><a href="#poza-eog"><span>04</span>Przekazywanie poza EOG</a></li>
+        <li><a href="#prawa"><span>05</span>Twoje prawa</a></li>
+        <li><a href="#cookies"><span>06</span>Pliki cookies</a></li>
+        <li><a href="#pozostale"><span>07</span>Pozostałe informacje</a></li>
+      </ol>
+    </nav>
+
+    <div>
+      <section class="rozdzial" id="administrator">
+        <span class="rozdzial__nr">01</span>
+        <h2>Kto jest administratorem Twoich danych</h2>
+        <p>Administratorem danych osobowych jest:</p>
+        <dl class="dane">
+          <dt>Firma</dt><dd>VEO DEVELOPMENT spółka z ograniczoną odpowiedzialnością</dd>
+          <dt>Siedziba</dt><dd>ul. Bukowska 18A/10, 60-811 Poznań</dd>
+          <dt>KRS</dt><dd>0001278950</dd>
+          <dt>NIP</dt><dd>7792614401</dd>
+          <dt>REGON</dt><dd>546173858</dd>
+          <dt>E-mail</dt><dd><a href="mailto:kontakt@veodevelopment.pl">kontakt@veodevelopment.pl</a></dd>
+        </dl>
+        <p>W tekście nazywamy się dalej „Veo” albo „my”. Nie wyznaczyliśmy inspektora ochrony danych. We wszystkich sprawach dotyczących danych osobowych napisz do nas na adres <a href="mailto:kontakt@veodevelopment.pl">kontakt@veodevelopment.pl</a> albo listownie na adres siedziby.</p>
+      </section>
+
+      <section class="rozdzial" id="cele">
+        <span class="rozdzial__nr">02</span>
+        <h2>Jakie dane przetwarzamy i po co</h2>
+        <p>Przetwarzamy tylko te dane, które są nam potrzebne. Poniżej znajdziesz każdą sytuację osobno.</p>
+
+        <div class="cel">
+          <h3>Kiedy do nas piszesz</h3>
+          <dl>
+            <dt>Dane</dt><dd>adres e-mail, imię i nazwisko (jeśli je podasz), treść wiadomości i inne informacje, które sam nam przekażesz.</dd>
+            <dt>Cel</dt><dd>odpowiedź na wiadomość i dalsza korespondencja, w tym przekazanie informacji o naszych inwestycjach, o które pytasz.</dd>
+            <dt>Podstawa</dt><dd>nasz prawnie uzasadniony interes, czyli możliwość odpowiadania na wiadomości (art. 6 ust. 1 lit. f RODO). Jeśli pytasz o zakup lokalu, także podjęcie działań na Twoje żądanie przed zawarciem umowy (art. 6 ust. 1 lit. b RODO).</dd>
+            <dt>Jak długo</dt><dd>przez czas korespondencji, a potem do upływu terminu przedawnienia ewentualnych roszczeń. Jeśli zawrzemy umowę, przez okres wymagany przepisami.</dd>
+          </dl>
+        </div>
+
+        <div class="cel">
+          <h3>Kiedy odwiedzasz stronę</h3>
+          <dl>
+            <dt>Dane</dt><dd>adres IP, data i godzina wizyty, adres odwiedzanej podstrony, typ przeglądarki i systemu. Serwer zapisuje je automatycznie w logach.</dd>
+            <dt>Cel</dt><dd>wyświetlenie strony, zapewnienie jej bezpieczeństwa i usuwanie błędów. Nie używamy tych danych do rozpoznawania, kim jesteś.</dd>
+            <dt>Podstawa</dt><dd>nasz prawnie uzasadniony interes, czyli sprawne i bezpieczne działanie strony (art. 6 ust. 1 lit. f RODO).</dd>
+            <dt>Jak długo</dt><dd>przez krótki okres ustalony przez dostawcę hostingu, po którym logi są automatycznie usuwane.</dd>
+          </dl>
+        </div>
+
+        <div class="cel">
+          <h3>Kiedy kontaktujesz się z nami na Instagramie</h3>
+          <dl>
+            <dt>Dane</dt><dd>nazwa profilu, wiadomości, komentarze i reakcje na profilu @veodevelopment.</dd>
+            <dt>Cel</dt><dd>prowadzenie profilu, odpowiadanie na wiadomości i komentarze oraz ogólne statystyki profilu.</dd>
+            <dt>Podstawa</dt><dd>nasz prawnie uzasadniony interes, czyli komunikacja z osobami zainteresowanymi Veo (art. 6 ust. 1 lit. f RODO).</dd>
+            <dt>Jak długo</dt><dd>dopóki dane są widoczne na profilu albo do czasu wniesienia skutecznego sprzeciwu.</dd>
+          </dl>
+        </div>
+        <p>W zakresie statystyk profilu jesteśmy współadministratorem razem z Meta Platforms Ireland Limited. Zasady przetwarzania danych przez Meta opisuje <a href="https://privacycenter.instagram.com/policy" target="_blank" rel="noopener">polityka prywatności Instagrama</a>.</p>
+
+        <h3>Ustalenie, dochodzenie i obrona roszczeń</h3>
+        <p>W razie potrzeby możemy przetwarzać powyższe dane, żeby ustalić, dochodzić albo bronić roszczeń. Podstawą jest nasz prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO), a dane przechowujemy do upływu terminów przedawnienia.</p>
+      </section>
+
+      <section class="rozdzial" id="odbiorcy">
+        <span class="rozdzial__nr">03</span>
+        <h2>Komu przekazujemy dane</h2>
+        <p>Nie sprzedajemy danych i nie udostępniamy ich w celach marketingowych. Dostęp do nich mają tylko firmy, które świadczą dla nas usługi, i tylko w zakresie potrzebnym do tych usług:</p>
+        <ul>
+          <li><strong>dostawca hostingu strony</strong>: Vercel Inc.;</li>
+          <li><strong>dostawca poczty elektronicznej</strong>: OVH SAS z siedzibą we Francji, na którego serwerach przechowywana jest nasza korespondencja;</li>
+          <li><strong>Meta Platforms Ireland Limited</strong>, jeśli kontaktujesz się z nami na Instagramie;</li>
+          <li><strong>nasi doradcy</strong>, np. biuro rachunkowe i kancelaria prawna, gdy jest to niezbędne;</li>
+          <li><strong>organy publiczne</strong>, jeśli wymagają tego przepisy prawa.</li>
+        </ul>
+      </section>
+
+      <section class="rozdzial" id="poza-eog">
+        <span class="rozdzial__nr">04</span>
+        <h2>Przekazywanie danych poza EOG</h2>
+        <p>Naszą pocztę obsługuje OVH SAS, który przechowuje dane w Unii Europejskiej. Niektórzy z pozostałych dostawców, np. Vercel Inc., mają siedzibę w Stanach Zjednoczonych albo korzystają z serwerów poza Europejskim Obszarem Gospodarczym. W takich przypadkach dane są przekazywane na podstawie decyzji Komisji Europejskiej stwierdzającej odpowiedni stopień ochrony (EU-US Data Privacy Framework) albo standardowych klauzul umownych zatwierdzonych przez Komisję Europejską. Na Twoją prośbę przekażemy informacje o zastosowanych zabezpieczeniach.</p>
+      </section>
+
+      <section class="rozdzial" id="prawa">
+        <span class="rozdzial__nr">05</span>
+        <h2>Twoje prawa</h2>
+        <p>W każdej chwili możesz:</p>
+        <ul>
+          <li>uzyskać dostęp do swoich danych i ich kopię (art. 15 RODO);</li>
+          <li>sprostować dane, które są nieprawidłowe albo niekompletne (art. 16 RODO);</li>
+          <li>żądać usunięcia danych (art. 17 RODO);</li>
+          <li>żądać ograniczenia przetwarzania (art. 18 RODO);</li>
+          <li>przenieść dane, jeśli przetwarzamy je w związku z umową, w sposób zautomatyzowany (art. 20 RODO);</li>
+          <li><strong>wnieść sprzeciw</strong> wobec przetwarzania opartego na naszym prawnie uzasadnionym interesie (art. 21 RODO);</li>
+          <li>złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych, ul. Stawki 2, 00-193 Warszawa, jeśli uważasz, że przetwarzamy dane niezgodnie z prawem.</li>
+        </ul>
+        <p>Żeby skorzystać z tych praw, napisz na <a href="mailto:kontakt@veodevelopment.pl">kontakt@veodevelopment.pl</a>. Zwykle odpowiadamy w ciągu kilku dni, a najpóźniej w ciągu miesiąca, bo taki termin wyznacza RODO.</p>
+      </section>
+
+      <section class="rozdzial" id="cookies">
+        <span class="rozdzial__nr">06</span>
+        <h2>Pliki cookies</h2>
+        <p>Nasza strona <strong>nie używa plików cookies</strong> ani innych technologii zapisujących informacje na Twoim urządzeniu w celach analitycznych czy reklamowych. Nie korzystamy z narzędzi do śledzenia odwiedzin ani z pikseli reklamowych. Czcionki i skrypty strony pobierasz z naszego serwera, a nie od zewnętrznych dostawców.</p>
+        <p>Jeśli w przyszłości dodamy narzędzia analityczne albo reklamowe, zaktualizujemy tę politykę i poprosimy Cię o zgodę wszędzie tam, gdzie wymagają tego przepisy.</p>
+      </section>
+
+      <section class="rozdzial" id="pozostale">
+        <span class="rozdzial__nr">07</span>
+        <h2>Pozostałe informacje</h2>
+        <h3>Dobrowolność</h3>
+        <p>Podanie danych jest dobrowolne. Bez adresu e-mail nie będziemy jednak mogli odpowiedzieć na Twoją wiadomość.</p>
+        <h3>Brak profilowania</h3>
+        <p>Nie podejmujemy decyzji w sposób zautomatyzowany i nie profilujemy Cię.</p>
+        <h3>Linki do innych stron</h3>
+        <p>Na stronie znajdziesz linki, np. do Instagrama. Po ich kliknięciu obowiązują zasady prywatności tych serwisów.</p>
+        <h3>Zmiany polityki</h3>
+        <p>Możemy aktualizować tę politykę, np. gdy uruchomimy nowe funkcje strony. Aktualna wersja jest zawsze dostępna na tej stronie, a data na górze pokazuje, od kiedy obowiązuje.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="stopka">
+  <div class="kontener">
+    <p class="stopka__firma">VEO DEVELOPMENT sp. z o.o. · ul. Bukowska 18A/10, 60-811 Poznań · Sąd Rejonowy Poznań – Nowe Miasto i Wilda w Poznaniu, VIII Wydział Gospodarczy KRS · KRS 0001278950 · NIP 7792614401 · REGON 546173858 · Kapitał zakładowy 5 000 zł</p>
+    <div class="stopka__dol">
+      <span>© 2026 Veo Development · Inni patrzą. My widzimy.</span>
+      <nav aria-label="Linki"><a href="/">Strona główna</a><a href="mailto:kontakt@veodevelopment.pl">kontakt@veodevelopment.pl</a><a href="https://www.instagram.com/veodevelopment" target="_blank" rel="noopener">Instagram</a></nav>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* contents list follows the section being read */
+(function () {
+  if (!("IntersectionObserver" in window)) return;
+  var linki = Array.prototype.slice.call(document.querySelectorAll(".spis a"));
+  var o = new IntersectionObserver(function (w) {
+    w.forEach(function (x) {
+      if (!x.isIntersecting) return;
+      linki.forEach(function (a) { a.classList.toggle("aktywny", a.getAttribute("href") === "#" + x.target.id); });
+    });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  document.querySelectorAll(".rozdzial").forEach(function (s) { o.observe(s); });
+})();
+</script>
+</body>
+</html>
